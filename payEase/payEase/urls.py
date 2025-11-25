@@ -28,4 +28,8 @@ urlpatterns = [
 
     # When we hit tenant control will goes to tenant.urls
     path('tenant/', include('tenant.urls')),
+
+    
+    # Hot reload
+    path('__reload__/', include('django_browser_reload.urls')),
 ]

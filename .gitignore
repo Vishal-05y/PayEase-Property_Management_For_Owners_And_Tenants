@@ -15,3 +15,6 @@ db.sqlite3
 payEase/owner/__pycache__/
 
 payEase/tenant/__pycache__/
+
+# Ignore Tailwind files, we can directly install
+theme/
