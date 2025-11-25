@@ -5,14 +5,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Owner</title>
+    <title>Login Tenant</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
 
     <div class="login-container">
         <form class="login-form">
-            <h2>Welcome Back Owner</h2>
+            <h2>Welcome Back Tenant</h2>
             <p>Please enter your details to sign in.</p>
 
             <div class="input-group">
@@ -26,12 +26,12 @@
             </div>
 
             <button type="submit">Sign In</button>
-
+            
             <div class="footer-links">
                 <a href="#">Forgot Password?</a>
             </div>
             <div class="footer-links">
-                <a href="/loginTenant">Are you Tenant?</a>
+                <a href="../../owner/loginOwner">Are you Owner?</a>
             </div>
         </form>
     </div>

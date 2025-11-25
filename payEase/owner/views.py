@@ -4,7 +4,7 @@ from django.http import HttpResponse
 # Create your views here.
 
 def ownerHome(request):
-    return HttpResponse('Hi Owner')
+    return render(request, 'owner/ownerHome.html' )
 
 def loginOwner(request):
-    return render(request, 'loginOwner.html')
+    return render(request, 'owner/loginOwner.html')
