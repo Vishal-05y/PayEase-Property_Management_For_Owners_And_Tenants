@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Tenant Details
+{% endblock %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold text-cyan-900 mb-6">Tenant Details</h1>
+
+<div class="max-w-xl mx-auto bg-cyan-50 border border-cyan-300 rounded-xl shadow-lg p-8 space-y-6">
+
+    <!-- Flat Type -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Flat Type</p>
+        <p class="text-xl font-bold text-cyan-900 mt-1">{{ tenant.get_type_display }}</p>
+    </div>
+
+    <!-- Tenant Name -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Tenant Name</p>
+        <p class="text-lg text-gray-800 mt-1">{{ tenant.name }}</p>
+    </div>
+
+    <!-- Phone Number -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Phone</p>
+        <p class="text-lg text-gray-800 mt-1">{{ tenant.phone }}</p>
+    </div>
+
+    <!-- Date Joined -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Joined Date</p>
+        <p class="text-lg text-gray-800 mt-1">{{ tenant.date_added|date:"F j, Y" }}</p>
+    </div>
+
+    <!-- Price -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Monthly Rent</p>
+        <p class="text-2xl font-bold text-cyan-900 mt-1">₹ {{ tenant.flat_price }}</p>
+    </div>
+
+    <!-- Pay Button -->
+    <div class="pt-4">
+        <button class="px-6 py-3 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-800 transition font-semibold w-full">
+            Payment History
+        </button>
+    </div>
+
+</div>
+
+{% endblock %}

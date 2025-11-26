@@ -1,9 +1,42 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Owner
+    Owner Dashboard
 {% endblock %}
 
 {% block content %}
-    <h1>Owner Home Page</h1>
+
+<h1 class="text-3xl font-bold text-cyan-900 mb-6">Flats</h1>
+
+<div class="space-y-6">
+    {% for tenant in tenants %}
+        <div class="p-6 bg-cyan-100 border border-cyan-300 rounded-xl shadow-md hover:shadow-xl transition">
+            
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-cyan-800">
+                    {{ tenant.get_type_display }}
+                </h2>
+            </div>
+
+            <p class="text-lg text-gray-700 mt-3">
+                Tenant Name: {{ tenant.name }}
+            </p>
+
+            <p class="text-sm text-gray-500 mt-1">
+                Added on: {{ tenant.date_aded|date:"F j, Y" }}
+            </p>
+            
+            <p class="text-sm text-gray-500 mt-1">
+                tenant Id: {{ tenant.id }}
+            
+            </p>
+            <button class="px-5 py-2 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-800 transition font-semibold flex items-center gap-2">
+                <a href="{% url 'tenant_details' tenant.id %}">
+                    Viwe Details
+                </a>
+            </button>
+        </div>
+    {% endfor %}
+</div>
+
 {% endblock %}

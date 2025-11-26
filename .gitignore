@@ -18,3 +18,9 @@ payEase/tenant/__pycache__/
 
 # Ignore Tailwind files, we can directly install
 theme/
+
+# Ignore owner migrations
+payEase/owner/migrations/
+
+# Ignore tenant migrations
+payEase/tenant/migrations/
