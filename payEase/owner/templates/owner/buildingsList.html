@@ -1,0 +1,41 @@
+{% extends "base/owner_layout.html" %}
+
+{% block title %}Buildings List{% endblock %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold text-cyan-900 mb-6">Buildings</h1>
+
+<div class="space-y-6">
+    {% for building in buildings%}
+        <div class="p-6 bg-cyan-100 border border-cyan-300 rounded-xl shadow-md hover:shadow-xl transition">
+            
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-semibold text-cyan-800">
+                    {{ tenant.get_type_display }}
+                </h2>
+            </div>
+
+            <p class="text-lg text-gray-700 mt-3">
+                Building Name: {{ building.name }}
+            </p>
+
+            <p class="text-lg text-gray-700 mt-3">
+                Building Address: {{ building.address }}
+            </p>
+
+            <p class="text-lg text-gray-700 mt-3">
+                Building Cost: {{ building.cost }}
+            </p>
+            
+            <!-- Passing the tenant id to another page with url, on button click -->
+            <button class="px-5 py-2 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-800 transition font-semibold flex items-center gap-2">
+                <a href="{% url 'buildingDetails' building.id %}">
+                    Viwe Details
+                </a>
+            </button>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

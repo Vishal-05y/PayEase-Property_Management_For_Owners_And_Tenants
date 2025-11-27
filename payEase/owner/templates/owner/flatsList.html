@@ -1,0 +1,65 @@
+{% extends "base/owner_layout.html" %}
+
+{% block title %}Flats List{% endblock %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold text-cyan-900 mb-6">Flats</h1>
+
+<!-- Dropdown Filter -->
+<form method="GET" class="mb-8">
+    <label class="text-lg font-semibold text-cyan-900">Select Flat Type:</label>
+    <select name="type" onchange="this.form.submit()" 
+            class="ml-2 px-4 py-2 border border-cyan-300 rounded-lg">
+        <option value="">-- Choose --</option>
+        
+        {% for value, label in flat_choices %}
+            <option value="{{ value }}" {% if flat_type == value %}selected{% endif %}>
+                {{ label }}
+            </option>
+        {% endfor %}
+    </select>
+</form>
+
+
+<!-- If a flat type is selected -->
+{% if flat_type %}
+
+    <!-- If no tenants exist -->
+    {% if flats_list|length == 0 %}
+        <p class="text-lg text-gray-700 bg-yellow-200 px-4 py-2 rounded">
+            No tenants available for this flat.
+        </p>
+
+    {% else %}
+
+        <div class="space-y-6">
+            {% for tenant in flats_list %}
+                <div class="p-6 bg-cyan-100 border border-cyan-300 rounded-xl shadow-md hover:shadow-xl transition">
+                    
+                    <h2 class="text-xl font-semibold text-cyan-900">
+                        {{ tenant.get_type_display }}
+                    </h2>
+
+                    <p class="text-lg mt-2">
+                        Tenant Name: <span class="font-semibold">{{ tenant.name }}</span>
+                    </p>
+
+                    <p class="text-gray-600 text-sm">
+                        Added on: {{ tenant.date_added|date:"F j, Y" }}
+                    </p>
+
+                    <a href="{% url 'tenant_details' tenant.id %}">
+                        <button class="mt-3 px-5 py-2 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-900 transition">
+                            View Details
+                        </button>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% endif %}
+
+{% endif %}
+
+{% endblock %}
