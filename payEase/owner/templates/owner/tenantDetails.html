@@ -10,10 +10,22 @@
 
 <div class="max-w-xl mx-auto bg-cyan-50 border border-cyan-300 rounded-xl shadow-lg p-8 space-y-6">
 
+    <!-- Building Name -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Building Name</p>
+        <p class="text-xl font-bold text-cyan-900 mt-1">{{ flat.building.name }}</p>
+    </div>
+
+    <!-- Flat Number -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Flat Number</p>
+        <p class="text-xl font-bold text-cyan-900 mt-1">{{ flat.flat_number }}</p>
+    </div>
+
     <!-- Flat Type -->
     <div>
         <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Flat Type</p>
-        <p class="text-xl font-bold text-cyan-900 mt-1">{{ tenant.get_type_display }}</p>
+        <p class="text-xl font-bold text-cyan-900 mt-1">{{flat.flat_type}}</p>
     </div>
 
     <!-- Tenant Name -->
@@ -28,11 +40,6 @@
         <p class="text-lg text-gray-800 mt-1">{{ tenant.phone }}</p>
     </div>
 
-    <!-- Date Joined -->
-    <div>
-        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Joined Date</p>
-        <p class="text-lg text-gray-800 mt-1">{{ tenant.date_added|date:"F j, Y" }}</p>
-    </div>
 
     <!-- Price -->
     <div>

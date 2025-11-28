@@ -5,8 +5,6 @@ urlpatterns = [
     path('', views.ownerHome, name='ownerHome'),
     path('loginOwner/', views.loginOwner , name='loginOwner'),
 
-    # Viewing the page with object id as url
-    path('<int:tenant_id>/', views.tenantDetails, name='tenant_details'),
 
     # Viewing the page with object id as url
     path('buildingsList/<int:building_id>/', views.buildingDetails, name='buildingDetails'),
@@ -21,5 +19,8 @@ urlpatterns = [
 
     path('buildingsList/<int:building_id>/flat/<int:flat_id>/', views.flatDetails, name='flatDetails'),
 
+    # Viewing the page with object id as url
+    path('buildingsList/<int:building_id>/flat/<int:flat_id>/tenant/<int:tenant_id>/', views.tenantDetails, name='tenantDetails'),
 
+    path('buildingsList/<int:building_id>/flat/<int:flat_id>/pastTenants/', views.pastTenants, name='pastTenants'),
 ]

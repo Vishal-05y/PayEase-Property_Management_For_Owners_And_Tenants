@@ -4,6 +4,7 @@ from .forms import BuildingForm
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Building, Flat
 from .forms import BuildingForm, FlatForm
+from django.http import Http404
 
 # Create your views here.
 
@@ -31,10 +32,6 @@ def loginOwner(request):
     return render(request, 'owner/loginOwner.html')
 
 
-# To get object details using url
-def tenantDetails(request, tenant_id):
-    tenant = get_object_or_404(Tenant, pk=tenant_id)
-    return render(request, 'owner/tenant_details.html', {'tenant':tenant})
 
 
 def buildingDetails(request, building_id):
@@ -115,5 +112,35 @@ def flatDetails(request, building_id, flat_id):
     return render(request, 'owner/flatDetails.html', {
         'flat': flat,
         'tenant': latest_tenant,
+        'building_id': building_id,   # IMPORTANT: add this
+    })
+
+
+
+def tenantDetails(request, building_id, flat_id, tenant_id):
+
+    # Get tenant using only valid fields
+    tenant = get_object_or_404(Tenant, id=tenant_id, flat_id=flat_id)
+
+    # Ensure tenant belongs to the correct building
+    if tenant.flat.building_id != building_id:
+        raise Http404("Tenant not in this building")
+
+    return render(request, 'owner/tenantDetails.html', {
+        'tenant': tenant,
+        'flat': tenant.flat,
+        'building': tenant.flat.building,
+    })
+
+
+def pastTenants(request, building_id, flat_id):
+    flat = get_object_or_404(Flat, id=flat_id, building_id=building_id)
+
+    # Get the most recent tenant for this flat
+    past_tenants = Tenant.objects.filter(flat_id = flat_id).order_by('-date_added')
+
+    return render(request, 'owner/pastTenants.html', {
+        'flat': flat,
+        'tenants': past_tenants,
         'building_id': building_id,   # IMPORTANT: add this
     })
