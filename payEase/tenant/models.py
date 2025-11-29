@@ -5,7 +5,7 @@ from owner.models import Flat   # IMPORTANT
 class Tenant(models.Model):
     flat = models.ForeignKey(Flat, on_delete=models.CASCADE, related_name='tenants')
     name = models.CharField(max_length=50)
-    phone = models.CharField(max_length=10, unique=True)
+    phone = models.CharField(max_length=10)
     flat_price = models.PositiveIntegerField()
     date_added = models.DateTimeField(default=timezone.now)
 

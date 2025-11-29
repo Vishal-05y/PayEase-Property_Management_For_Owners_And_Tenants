@@ -1,5 +1,4 @@
 from tenant.models import Tenant
-from django.db.models import Max
 from .forms import BuildingForm
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Building, Flat
@@ -37,7 +36,7 @@ def loginOwner(request):
 def buildingDetails(request, building_id):
     building = get_object_or_404(Building, pk=building_id)
     flats = building.flats.all()
-    return render(request, 'owner/buildingDetails.html', {
+    return render(request, 'building/buildingDetails.html', {
         'building': building,
         'flats': flats,
     })
@@ -79,12 +78,12 @@ def addBuilding(request):
     else:
         form = BuildingForm()
 
-    return render(request, 'owner/addBuilding.html', {'form': form})
+    return render(request, 'building/addBuilding.html', {'form': form})
 
 
 def buildingsList(request):
     buildings = Building.objects.all()
-    return render(request, 'owner/buildingsList.html', {'buildings': buildings})
+    return render(request, 'building/buildingsList.html', {'buildings': buildings})
 
 
 def addFlat(request, building_id):
@@ -100,7 +99,7 @@ def addFlat(request, building_id):
     else:
         form = FlatForm()
 
-    return render(request, 'owner/addFlat.html', {'form': form, 'building': building})
+    return render(request, 'flat/addFlat.html', {'form': form, 'building': building})
 
 
 def flatDetails(request, building_id, flat_id):
@@ -109,7 +108,7 @@ def flatDetails(request, building_id, flat_id):
     # Get the most recent tenant for this flat
     latest_tenant = flat.tenants.order_by('-date_added').first()
 
-    return render(request, 'owner/flatDetails.html', {
+    return render(request, 'flat/flatDetails.html', {
         'flat': flat,
         'tenant': latest_tenant,
         'building_id': building_id,   # IMPORTANT: add this
@@ -126,7 +125,7 @@ def tenantDetails(request, building_id, flat_id, tenant_id):
     if tenant.flat.building_id != building_id:
         raise Http404("Tenant not in this building")
 
-    return render(request, 'owner/tenantDetails.html', {
+    return render(request, 'tenant/tenantDetails.html', {
         'tenant': tenant,
         'flat': tenant.flat,
         'building': tenant.flat.building,
@@ -139,7 +138,7 @@ def pastTenants(request, building_id, flat_id):
     # Get the most recent tenant for this flat
     past_tenants = Tenant.objects.filter(flat_id = flat_id).order_by('-date_added')
 
-    return render(request, 'owner/pastTenants.html', {
+    return render(request, 'tenant/pastTenants.html', {
         'flat': flat,
         'tenants': past_tenants,
         'building_id': building_id,   # IMPORTANT: add this
