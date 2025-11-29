@@ -1,40 +1,33 @@
-{% load static %}
+{% extends "base/owner_layout.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Tenant</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-</head>
-<body>
+{% block title %}Login Tenant{% endblock %}
 
-    <div class="login-container">
-        <form class="login-form">
-            <h2>Welcome Back Tenant</h2>
-            <p>Please enter your details to sign in.</p>
+{% block content %}
 
-            <div class="input-group">
-                <label for="username">Username / Email</label>
-                <input type="text" id="username" name="username" required>
-            </div>
 
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
+{% if form.phone.errors %}
+<div class="mb-4 p-4 rounded-lg bg-red-100 border border-red-300 text-red-800 font-medium">
+    {{ form.phone.errors.0 }}
+</div>
+{% endif %}
 
-            <button type="submit">Sign In</button>
-            
-            <div class="footer-links">
-                <a href="#">Forgot Password?</a>
-            </div>
-            <div class="footer-links">
-                <a href="../../owner/loginOwner">Are you Owner?</a>
-            </div>
-        </form>
+<form method="POST" class="space-y-6">
+    {% csrf_token %}
+
+    <div>
+        <label class="font-semibold">Name</label>
+        {{ form.name }}
+    </div>
+    
+    <div>
+        <label class="font-semibold">Phone</label>
+        {{ form.phone }}
     </div>
 
-</body>
-</html>
+    <button type="submit"
+        class="w-full bg-cyan-700 text-white py-3 rounded-lg hover:bg-cyan-800 transition font-semibold">
+        Login
+    </button>
+</form>
+
+{% endblock %}

@@ -6,18 +6,17 @@
     {% tailwind_css %}
 </head>
 
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="bg-cyan-800 min-h-screen flex flex-col">
 
     <!-- TENANT NAVBAR -->
-    <nav class="bg-indigo-700 shadow-lg">
+    <nav class="bg-cyan-900 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 class="text-white text-2xl font-semibold tracking-wide">Tenant Panel</h1>
+            <h1 class="text-white text-2xl font-semibold tracking-wide">PayEase</h1>
 
             <div class="space-x-6">
-                <a href="{% url 'tenant_dashboard' %}" class="text-indigo-100 hover:text-white">Dashboard</a>
-                <a href="{% url 'tenant_payments' %}" class="text-indigo-100 hover:text-white">Payments</a>
-                <a href="{% url 'tenant_profile' %}" class="text-indigo-100 hover:text-white">Profile</a>
-                <a href="{% url 'logout' %}" class="text-indigo-100 hover:text-white">Logout</a>
+                {% comment %} <a href="{% url 'tenant_payments' %}" class="text-indigo-100 hover:text-white">Payments</a> {% endcomment %}
+                {% comment %} <a href="{% url 'tenant_profile' %}" class="text-indigo-100 hover:text-white">Profile</a> {% endcomment %}
+                {% comment %} <a href="{% url 'logout' %}" class="text-indigo-100 hover:text-white">Logout</a> {% endcomment %}
             </div>
         </div>
     </nav>

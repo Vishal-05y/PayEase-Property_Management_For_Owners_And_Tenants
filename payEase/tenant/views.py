@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import TenantForm
+from .forms import addTenantForm, loginTenantForm
 from owner.models import Flat
 from django.utils import timezone
 from .models import Tenant
+from django.http import HttpResponse
 
 # Create your views here.
 def tenantHome(request):
@@ -10,14 +11,33 @@ def tenantHome(request):
 
 
 def loginTenant(request):
-    return render(request, 'tenant/loginTenant.html')
+    if request.method == 'POST':
+        form = loginTenantForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            phone = form.cleaned_data['phone']
+
+            # Get all tenant records with this phone
+            tenants = Tenant.objects.filter(name=name, phone=phone).order_by('-date_added')
+
+            if tenants.exists():
+                return redirect('tenantDashboard', phone=phone)
+            else:
+                return render(request, 'tenant/loginTenant.html', {
+                    'form': form,
+                    'error': "No tenant found with this phone number."
+                })
+    else:
+        form = loginTenantForm()
+
+    return render(request, 'tenant/loginTenant.html', {'form': form})
 
 
 def addTenant(request, building_id, flat_id):
     flat = get_object_or_404(Flat, id=flat_id, building_id=building_id)
 
     if request.method == "POST":
-        form = TenantForm(request.POST)
+        form = addTenantForm(request.POST)
         
         if form.is_valid():
             name = form.cleaned_data['name']
@@ -45,7 +65,7 @@ def addTenant(request, building_id, flat_id):
                 return redirect('flatDetails', building_id=building_id, flat_id=flat_id)
     
     else:
-        form = TenantForm()
+        form = addTenantForm()
 
     return render(request, 'tenant/addTenant.html', {
         'form': form,
@@ -53,6 +73,34 @@ def addTenant(request, building_id, flat_id):
     })
 
 
-# def tenantDetails(request, building_id, flat_id):
-#     tenant = Tenant.objects.all()
-#     return render(request, 'tenant/tenantDetails.html', {'tenant':tenant})
+def tenantDashboard(request, phone):
+    # Get all flat records for this phone
+    tenant = Tenant.objects.filter(phone=phone).select_related('flat', 'flat__building').order_by('-date_added')
+
+    if not tenant.exists():
+        return HttpResponse("No tenant found with this phone number")
+    
+    latest_flat = tenant.first()
+
+    return render(request, 'tenant/tenantDashboard.html', {
+        'tenant': latest_flat,
+        'phone': phone,
+    })
+
+
+def allFlats(request, phone):
+    # Get all flat records for this phone
+    tenant = Tenant.objects.filter(phone=phone).select_related('flat', 'flat__building')
+
+    if not tenant.exists():
+        return HttpResponse("No tenant found with this phone number")
+
+    # The latest tenant entry will give the correct name
+    latest_tenant = tenant.order_by('-date_added').first()
+    name = latest_tenant.name
+
+    return render(request, 'tenant/allFlats.html', {
+        'tenant': tenant,
+        'phone': phone,
+        'name': name
+    })

@@ -1,0 +1,39 @@
+{% extends "base/tenant_layout.html" %}
+
+{% block title %}All Flats{% endblock %}
+
+{% block content %}
+
+
+<div class="space-y-6">
+    <h1 class="text-3xl font-bold text-cyan-900 mb-6">
+        Past Flats Details
+    </h1>
+    {% for flat in tenant %}
+        <div class="p-6 bg-white border border-cyan-300 rounded-lg shadow">
+
+            <h2 class="text-xl font-semibold text-cyan-800">
+                Building: {{ flat.flat.building.name }}
+            </h2>
+
+            <p class="text-gray-600">
+                Flat: {{ flat.flat.flat_number }} ({{ flat.flat.flat_type }})
+            </p>
+
+
+            <p class="text-gray-500">
+                Last Joined: {{ flat.date_added|date:"F j, Y" }}
+            </p>
+
+            {% comment %} <a href="{% url 'tenantFlatDetail' flat.id %}">
+                <button class="mt-3 px-4 py-2 bg-cyan-700 text-white rounded-md hover:bg-cyan-900">
+                    View Flat Details
+                </button>
+            </a> {% endcomment %}
+
+        </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
