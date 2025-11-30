@@ -14,10 +14,7 @@
             <h1 class="text-white text-2xl font-semibold tracking-wide">PayEase</h1>
 
             <div class="space-x-6">
-                <a href="{% url 'ownerHome' %}" class="text-cyan-100 hover:text-white">Dashboard</a>
-                <a href="{% url 'buildingsList' %}" class="text-cyan-100 hover:text-white">Buildings</a>
-                <a href="{% url 'addBuilding' %}" class="text-cyan-100 hover:text-white">Add Building</a>
-                {% comment %} <a href="{% url 'logout' %}" class="text-cyan-100 hover:text-white">Logout</a> {% endcomment %}
+                {% block navbar %}{% endblock %}
             </div>
         </div>
     </nav>

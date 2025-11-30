@@ -21,7 +21,7 @@
 
     <!-- Right: Add Flat Button -->
     <div>
-        <a href="{% url 'addFlat' building.id %}">
+        <a href="{% url 'addFlat' phone building.id %}">
             <button class="px-6 py-3 bg-cyan-700 text-white rounded-xl shadow hover:bg-cyan-900 transition font-semibold">
                 + Add Flat
             </button>
@@ -48,7 +48,7 @@
                 Type: <span class="font-semibold">{{ flat.flat_type }}</span>
             </p>
 
-            <a href="{% url 'flatDetails' building.id flat.id %}">
+            <a href="{% url 'flatDetails' phone building.id flat.id %}">
                 <button class="mt-5 px-5 py-2 bg-cyan-700 text-white rounded-lg hover:bg-cyan-900 transition shadow font-semibold">
                     View Flat
                 </button>

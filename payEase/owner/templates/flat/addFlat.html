@@ -4,28 +4,47 @@
 
 {% block content %}
 
-<h1 class="text-3xl font-bold text-cyan-900 mb-6">Add Flat</h1>
+<h1 class="text-3xl font-extrabold text-cyan-900 mb-6 text-center">
+    Add New Flat
+</h1>
 
-<p class="text-gray-700 mb-6">
-    Building: <strong>{{ building.name }}</strong>
+<p class="text-gray-700 text-center mb-8">
+    Building: <strong class="text-cyan-800">{{ building.name }}</strong>
 </p>
 
-<form method="POST" class="space-y-6">
-    {% csrf_token %}
+<!-- Center Card -->
+<div class="max-w-xl mx-auto bg-white rounded-2xl p-10">
 
-    <div>
-        <label>Flat Number</label>
-        <input type="text" name="flat_number" class="w-full p-2 border rounded" required>
-    </div>
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
 
-    <div>
-        <label>Flat Type</label>
-        <input type="text" name="flat_type" class="w-full p-2 border rounded" required>
-    </div>
+        <!-- Flat Number -->
+        <div class="flex flex-col space-y-1">
+            <label class="font-semibold text-gray-700">Flat Number</label>
+            <input type="text" name="flat_number"
+                class="border border-gray-300 rounded-lg p-3 w-full
+                       focus:ring-2 focus:ring-cyan-600 focus:outline-none"
+                placeholder="Enter flat number" required>
+        </div>
 
-    <button class="px-6 py-2 bg-cyan-700 text-white rounded-lg hover:bg-cyan-900 transition">
-        Save Flat
-    </button>
-</form>
+        <!-- Flat Type -->
+        <div class="flex flex-col space-y-1">
+            <label class="font-semibold text-gray-700">Flat Type</label>
+            <input type="text" name="flat_type"
+                class="border border-gray-300 rounded-lg p-3 w-full
+                       focus:ring-2 focus:ring-cyan-600 focus:outline-none"
+                placeholder="Enter flat type (Ex: 1BHK, 2BHK)" required>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit"
+            class="w-full bg-cyan-700 text-white py-3 rounded-xl font-semibold
+                   shadow hover:bg-cyan-800 transition">
+            Save Flat
+        </button>
+
+    </form>
+
+</div>
 
 {% endblock %}

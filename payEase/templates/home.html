@@ -3,10 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>PayEase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <a href="owner">Owner</a>
-    <a href="tenant">Tenant</a>
+
+<body class="bg-cyan-800 h-screen flex items-center justify-center">
+
+    <div class="bg-white w-full max-w-md p-10 rounded-2xl shadow-2xl text-center space-y-8">
+
+        <h1 class="text-4xl font-extrabold text-cyan-900">
+            PayEase
+        </h1>
+
+        <p class="text-gray-600 text-lg">
+            Choose your login portal
+        </p>
+
+        <div class="space-y-4">
+
+            <a href="owner" class="block">
+                <button class="w-full py-3 bg-cyan-700 text-white font-semibold rounded-xl shadow hover:bg-cyan-900 transition">
+                    Owner Portal
+                </button>
+            </a>
+
+            <a href="tenant" class="block">
+                <button class="w-full py-3 bg-gray-700 text-white font-semibold rounded-xl shadow hover:bg-gray-900 transition">
+                    Tenant Portal
+                </button>
+            </a>
+
+        </div>
+
+    </div>
+
 </body>
 </html>

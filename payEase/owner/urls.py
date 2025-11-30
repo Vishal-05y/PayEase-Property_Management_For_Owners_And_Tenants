@@ -3,24 +3,22 @@ from . import views
 
 urlpatterns = [
     path('', views.ownerHome, name='ownerHome'),
+
+    path('signUpOwner/', views.signUpOwner , name='signUpOwner'),
+
     path('loginOwner/', views.loginOwner , name='loginOwner'),
 
+    path('<int:phone>/dashboard/', views.ownerDashboard, name='ownerDashboard'),
 
-    # Viewing the page with object id as url
-    path('buildingsList/<int:building_id>/', views.buildingDetails, name='buildingDetails'),
+    path('<int:phone>/building/add/', views.addBuilding, name='addBuilding'),
 
-    path('flatsList/', views.flatsList, name='flatsList'),
+    path('<int:phone>/buildingsList/<int:building_id>/', views.buildingDetails, name='buildingDetails'),
 
-    path('buildingsList/', views.buildingsList, name='buildingsList'),
+    path('<int:phone>/buildings/<int:building_id>/addFlat/', views.addFlat, name='addFlat'),
 
-    path('building/add/', views.addBuilding, name='addBuilding'),
+    path('<int:phone>/buildingsList/<int:building_id>/flat/<int:flat_id>/', views.flatDetails, name='flatDetails'),
 
-    path('buildings/<int:building_id>/addFlat/', views.addFlat, name='addFlat'),
-
-    path('buildingsList/<int:building_id>/flat/<int:flat_id>/', views.flatDetails, name='flatDetails'),
-
-    # Viewing the page with object id as url
     path('buildingsList/<int:building_id>/flat/<int:flat_id>/tenant/<int:tenant_id>/', views.tenantDetails, name='tenantDetails'),
-
-    path('buildingsList/<int:building_id>/flat/<int:flat_id>/pastTenants/', views.pastTenants, name='pastTenants'),
+    
+    path('<int:phone>/buildingsList/<int:building_id>/flat/<int:flat_id>/pastTenants/', views.pastTenants, name='pastTenants'),
 ]

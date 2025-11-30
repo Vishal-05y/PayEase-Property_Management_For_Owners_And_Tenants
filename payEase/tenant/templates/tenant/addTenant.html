@@ -4,38 +4,66 @@
 
 {% block content %}
 
-<h2 class="text-xl font-semibold text-cyan-800 mb-6">
-    Add Tenant for Flat: {{ flat.flat_number }} ({{ flat.flat_type }})
+<h2 class="text-3xl font-extrabold text-cyan-900 mb-6 text-center">
+    Add Tenant
 </h2>
 
+<p class="text-gray-700 text-center mb-8">
+    Flat <strong>{{ flat.flat_number }}</strong> ({{ flat.flat_type }})
+</p>
+
+<!-- Error Message -->
 {% if form.phone.errors %}
-<div class="mb-4 p-4 rounded-lg bg-red-100 border border-red-300 text-red-800 font-medium">
+<div class="mb-6 p-4 rounded-lg bg-red-100 border border-red-300 text-red-800 font-medium">
     {{ form.phone.errors.0 }}
 </div>
 {% endif %}
 
-<form method="POST" class="space-y-6">
-    {% csrf_token %}
+<!-- Styled Form Card -->
+<div class="max-w-xl mx-auto bg-white rounded-2xl p-10">
 
-    <div>
-        <label class="font-semibold">Name</label>
-        {{ form.name }}
-    </div>
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
 
-    <div>
-        <label class="font-semibold">Phone</label>
-        {{ form.phone }}
-    </div>
+        <!-- Tenant Name -->
+        <div class="flex flex-col space-y-1">
+            <label class="font-semibold text-gray-700">Tenant Name</label>
+            <input type="text" name="name"
+                   value="{{ form.name.value|default_if_none:'' }}"
+                   class="border border-gray-300 rounded-lg p-3 w-full
+                          focus:ring-2 focus:ring-cyan-600 focus:outline-none"
+                   placeholder="Enter tenant name" required>
+        </div>
 
-    <div>
-        <label class="font-semibold">Flat Price</label>
-        {{ form.flat_price }}
-    </div>
+        <!-- Phone -->
+        <div class="flex flex-col space-y-1">
+            <label class="font-semibold text-gray-700">Phone Number</label>
+            <input type="text" name="phone"
+                   value="{{ form.phone.value|default_if_none:'' }}"
+                   class="border border-gray-300 rounded-lg p-3 w-full
+                          focus:ring-2 focus:ring-cyan-600 focus:outline-none"
+                   placeholder="Enter phone number" required>
+        </div>
 
-    <button type="submit"
-        class="w-full bg-cyan-700 text-white py-3 rounded-lg hover:bg-cyan-800 transition font-semibold">
-        Save Tenant
-    </button>
-</form>
+        <!-- Flat Price -->
+        <div class="flex flex-col space-y-1">
+            <label class="font-semibold text-gray-700">Monthly Rent</label>
+            <input type="number" name="flat_price"
+                   value="{{ form.flat_price.value|default_if_none:'' }}"
+                   class="border border-gray-300 rounded-lg p-3 w-full
+                          focus:ring-2 focus:ring-cyan-600 focus:outline-none"
+                   placeholder="Enter monthly rent" required>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit"
+            class="w-full bg-cyan-700 text-white py-3 rounded-xl font-semibold
+                   shadow hover:bg-cyan-800 transition">
+            Save Tenant
+        </button>
+
+    </form>
+
+</div>
 
 {% endblock %}
