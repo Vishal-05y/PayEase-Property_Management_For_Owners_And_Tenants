@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from .models import Owner, Building, Flat
 from .forms import SignUpOwnerForm, LoginOwnerForm, BuildingForm, FlatForm, addTenantForm
+from datetime import datetime
 
 from tenant.models import Tenant, RentPayment
 
@@ -69,8 +70,6 @@ def logoutOwner(request):
 
 
 # -------------------- DASHBOARD --------------------
-
-from datetime import datetime
 
 def ownerDashboard(request):
     phone = request.session.get('owner_phone')
@@ -170,11 +169,37 @@ def buildingDetails(request, building_id):
     if not phone:
         return redirect('loginOwner')
 
+    # Get building owned by this owner
     building = get_object_or_404(Building, id=building_id, owner__phone=phone)
+
+    flats = building.flats.all()
+    current_month = datetime.now().strftime("%B %Y")
+
+    unpaid_tenants = []
+
+    for flat in flats:
+        # Get latest tenant for this flat
+        latest_tenant = flat.tenants.order_by('-date_added').first()
+
+        if latest_tenant:
+            # Check if they paid this month
+            paid = RentPayment.objects.filter(
+                tenant=latest_tenant,
+                flat=flat,
+                month=current_month,
+                status="PAID"
+            ).exists()
+
+            if not paid:
+                unpaid_tenants.append(latest_tenant)
+
     return render(request, 'building/buildingDetails.html', {
         'building': building,
-        'flats': building.flats.all(),
+        'flats': flats,
+        'unpaid_tenants': unpaid_tenants,
+        'current_month': current_month,
     })
+
 
 
 # -------------------- ADD FLAT --------------------
@@ -343,7 +368,8 @@ def tenantPaymentHistory(request, building_id, flat_id):
         payments = RentPayment.objects.filter(
             tenant=tenant,
             flat=flat
-        ).order_by('-date_paid')
+        ).order_by('-id')  # newest record always at top
+
 
     return render(request, 'tenant/tenantPaymentHistory.html', {
         'flat': flat,

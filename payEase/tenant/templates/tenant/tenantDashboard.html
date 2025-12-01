@@ -3,6 +3,7 @@
 {% block title %}Tenant Dashboard{% endblock %}
 
 {% block navbar %}
+<a href="{% url 'tenantDashboard' %}"  class="text-white">Dashboard</a>
 <a href="{% url 'logoutTenant' %}">
     <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
 </a>

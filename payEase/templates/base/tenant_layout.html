@@ -9,10 +9,14 @@
 <body class="bg-cyan-800 min-h-screen flex flex-col">
 
     <!-- TENANT NAVBAR -->
-    <nav class="bg-cyan-900 shadow-lg">
+    <nav class="bg-cyan-900">
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 class="text-white text-2xl font-semibold tracking-wide">PayEase</h1>
-            {% block navbar %}{% endblock %}
+            <h1 class="text-white text-2xl font-semibold tracking-wide">
+                PayEase
+            </h1>
+            <div class="flex items-center space-x-6">
+                {% block navbar %}{% endblock %}
+            </div>
         </div>
     </nav>
 
