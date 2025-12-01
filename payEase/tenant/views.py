@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import loginTenantForm
-from .models import Tenant
+from .models import Tenant, RentPayment
 from django.http import HttpResponse
+from datetime import datetime
 
 # Create your views here.
 def tenantHome(request):
@@ -66,10 +67,88 @@ def allFlats(request):
     })
 
 
+
+
 def payRent(request):
     phone = request.session.get('tenant_phone')
-    tenant = get_object_or_404(Tenant, phone=phone)
-    return render(request, 'tenant/payRent.html', {'tenant': tenant})
+    if not phone:
+        return redirect('loginTenant')
+
+    tenant = Tenant.objects.filter(phone=phone).order_by('-date_added').first()
+    if not tenant:
+        return HttpResponse("Tenant not found")
+
+    current_month = datetime.now().strftime("%B %Y")
+
+    already_paid = RentPayment.objects.filter(
+        tenant=tenant,
+        month=current_month,
+        status="PAID"
+    ).exists()
+
+    return render(request, 'tenant/payRent.html', {
+        'tenant': tenant,
+        'current_month': current_month,
+        'already_paid': already_paid
+    })
+
+
+def processPayment(request):
+    if request.method != "POST":
+        return redirect('tenantDashboard')
+
+    phone = request.session.get('tenant_phone')
+    tenant = Tenant.objects.filter(phone=phone).order_by('-date_added').first()
+    if not tenant:
+        return HttpResponse("Tenant not found")
+
+    current_month = datetime.now().strftime("%B %Y")
+
+    # prevent duplicate payment
+    if RentPayment.objects.filter(tenant=tenant, month=current_month, status="PAID").exists():
+        return redirect('paymentSuccess')
+
+    fake_payment_id = f"FAKEPAY-{datetime.now().timestamp()}"
+
+    RentPayment.objects.create(
+        tenant=tenant,
+        flat=tenant.flat,
+        amount=tenant.flat_price,
+        month=current_month,
+        status="PAID",
+        payment_id=fake_payment_id
+    )
+
+    return redirect('paymentSuccess')
+
+
+
+def paymentSuccess(request):
+    phone = request.session.get('tenant_phone')
+    tenant = Tenant.objects.filter(phone=phone).order_by('-date_added').first()
+
+    last_payment = RentPayment.objects.filter(
+        tenant=tenant
+    ).order_by('-date_paid').first()
+
+    return render(request, 'tenant/paymentSuccess.html', {
+        'tenant': tenant,
+        'payment': last_payment
+    })
+
+
+def rentHistory(request):
+    phone = request.session.get('tenant_phone')
+    tenant = Tenant.objects.filter(phone=phone).order_by('-date_added').first()
+
+    payments = RentPayment.objects.filter(
+        tenant=tenant
+    ).order_by('-date_paid')
+
+    return render(request, 'tenant/rentHistory.html', {
+        'tenant': tenant,
+        'payments': payments
+    })
 
 
 def logoutTenant(request):

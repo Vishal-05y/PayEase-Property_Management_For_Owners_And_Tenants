@@ -1,0 +1,23 @@
+{% extends "base/tenant_layout.html" %}
+
+{% block title %}Payment Success{% endblock %}
+
+{% block content %}
+
+<div class="max-w-lg mx-auto mt-10 bg-green-50 border border-green-300 rounded-xl shadow-lg p-8 text-center">
+
+    <h2 class="text-3xl font-bold text-green-800">Payment Successful ✔</h2>
+
+    <p class="text-xl text-green-700 mt-3">
+        Your rent has been successfully paid for this month.
+    </p>
+
+    <a href="{% url 'tenantDashboard' %}">
+        <button class="mt-6 px-6 py-3 bg-green-700 text-white rounded-lg hover:bg-green-800 font-semibold">
+            Go to Dashboard
+        </button>
+    </a>
+
+</div>
+
+{% endblock %}

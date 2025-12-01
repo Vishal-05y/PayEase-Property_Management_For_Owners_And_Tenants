@@ -1,0 +1,42 @@
+{% extends "base/tenant_layout.html" %}
+
+{% block title %}Pay Rent{% endblock %}
+
+{% block content %}
+
+<div class="max-w-lg mx-auto bg-white shadow-lg p-8 rounded-lg border border-cyan-300">
+
+    <h2 class="text-3xl font-bold text-cyan-900 mb-6">Pay Rent</h2>
+    
+    <h2 class="text-xl font-bold text-cyan-900">Building Details</h2>
+    <p class="text-lg font-semibold">Name: {{ tenant.flat.building.name }}</p>
+    <p class="text-lg font-semibold">Address: {{ tenant.flat.building.address }}</p><br>
+
+    <h2 class="text-xl font-bold text-cyan-900">Owner Details</h2>
+    <p class="text-lg font-semibold">Name: {{ tenant.flat.building.owner.name }}</p>
+    <p class="text-lg font-semibold">Owner Phone: {{ tenant.flat.building.owner.phone }}</p><br>
+
+    <h2 class="text-xl font-bold text-cyan-900">Tenant Details</h2>
+    <p class="text-lg font-semibold">Name: {{ tenant.name }}</p>
+    <p class="text-lg font-semibold">Flat: {{ tenant.flat.flat_number }}</p>
+    <p class="text-lg font-semibold">Month: {{ current_month }}</p>
+
+    <p class="text-2xl font-bold mt-3 text-green-700">
+        Amount: ₹{{ tenant.flat_price }}
+    </p>
+
+    {% if already_paid %}
+        <p class="mt-6 text-xl text-green-600 font-semibold">
+            ✔ Rent already paid for this month.
+        </p>
+    {% else %}
+        <form action="{% url 'processPayment' %}" method="POST">
+            {% csrf_token %}
+            <button class="mt-6 w-full bg-green-700 text-white py-3 rounded-lg hover:bg-green-800 font-semibold">
+                Proceed to Payment
+            </button>
+        </form>
+    {% endif %}
+</div>
+
+{% endblock %}

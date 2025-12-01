@@ -99,9 +99,11 @@
 <!-- Payment History Button -->
 <div class="max-w-xl mx-auto space-y-6">
     <div class="pt-4">
-        <button class="px-6 py-3 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-800 transition font-semibold w-full">
-            Payment History
-        </button>
+        <a href="{% url 'rentHistory' %}">
+            <button class="px-6 py-3 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-800 transition font-semibold w-full">
+                Payment History
+            </button>
+        </a>
     </div>
 </div>
 

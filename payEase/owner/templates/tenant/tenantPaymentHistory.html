@@ -1,0 +1,79 @@
+{% extends "base/owner_layout.html" %}
+
+{% block title %}Payment History{% endblock %}
+
+{% block navbar %}
+<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
+<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
+<a href="{% url 'logoutOwner' %}">
+    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
+</a>
+{% endblock %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold text-cyan-900 mb-6">
+    Payment History — Flat {{ flat.flat_number }}
+</h1>
+
+{% if tenant %}
+    <p class="text-lg mb-4">
+        <strong>Tenant:</strong> {{ tenant.name }} ({{ tenant.phone }})
+    </p>
+{% else %}
+    <p class="text-gray-600 mb-4">No tenant currently assigned.</p>
+{% endif %}
+
+<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl border border-cyan-300 overflow-hidden">
+
+    <table class="w-full text-left border-collapse">
+        <thead class="bg-cyan-700 text-white">
+            <tr>
+                <th class="py-3 px-4 text-sm font-semibold">Month</th>
+                <th class="py-3 px-4 text-sm font-semibold">Amount</th>
+                <th class="py-3 px-4 text-sm font-semibold">Payment ID</th>
+                <th class="py-3 px-4 text-sm font-semibold">Date</th>
+                <th class="py-3 px-4 text-sm font-semibold">Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% if payments %}
+            {% for p in payments %}
+                <tr class="border-b hover:bg-cyan-50">
+                    <td class="py-3 px-4 font-medium">{{ p.month }}</td>
+                    <td class="py-3 px-4">₹{{ p.amount }}</td>
+                    <td class="py-3 px-4 text-sm">{{ p.payment_id }}</td>
+                    <td class="py-3 px-4 text-sm">{{ p.date_paid|date:"F j, Y" }}</td>
+                    <td class="py-3 px-4">
+                        {% if p.status == "PAID" %}
+                            <span class="px-2 py-1 bg-green-200 text-green-800 rounded text-xs font-semibold">
+                                PAID
+                            </span>
+                        {% else %}
+                            <span class="px-2 py-1 bg-red-200 text-red-800 rounded text-xs font-semibold">
+                                FAILED
+                            </span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="5" class="text-center py-6 text-gray-600">
+                    No payment records found.
+                </td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+
+</div>
+
+<a href="{% url 'flatDetails' flat.building.id flat.id %}">
+    <button class="mt-6 px-6 py-3 bg-cyan-700 text-white rounded-lg hover:bg-cyan-800 font-semibold">
+        Back to Flat
+    </button>
+</a>
+
+{% endblock %}
