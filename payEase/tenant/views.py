@@ -66,6 +66,12 @@ def allFlats(request):
     })
 
 
+def payRent(request):
+    phone = request.session.get('tenant_phone')
+    tenant = get_object_or_404(Tenant, phone=phone)
+    return render(request, 'tenant/payRent.html', {'tenant': tenant})
+
+
 def logoutTenant(request):
     request.session.flush()
     return redirect('loginTenant')

@@ -105,9 +105,21 @@ def addBuilding(request):
     if request.method == "POST":
         form = BuildingForm(request.POST)
         if form.is_valid():
+            name = form.cleaned_data['name']
+            address = form.cleaned_data['address']
+
+            # Check for duplicate building for same owner
+            if Building.objects.filter(owner=owner, name=name, address=address).exists():
+                return render(request, 'building/addBuilding.html', {
+                    'form': form,
+                    'error': "Building already exists. Try adding flats in it or create a new building."
+                })
+
+            # Otherwise save building
             building = form.save(commit=False)
             building.owner = owner
             building.save()
+
             return redirect('ownerDashboard')
 
     else:
@@ -144,6 +156,15 @@ def addFlat(request, building_id):
     if request.method == "POST":
         form = FlatForm(request.POST)
         if form.is_valid():
+            flat_number = form.cleaned_data['flat_number']
+
+            if Flat.objects.filter(flat_number=flat_number).exists():
+                return render(request, 'flat/addflat.html', {
+                    'form': form,
+                    'building': building,
+                    'error': "Flat already exists. Try to add new flat."
+                })
+            
             flat = form.save(commit=False)
             flat.building = building
             flat.save()

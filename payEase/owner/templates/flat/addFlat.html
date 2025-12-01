@@ -44,6 +44,13 @@
                 placeholder="Enter flat type (Ex: 1BHK, 2BHK)" required>
         </div>
 
+        <!-- Error -->
+        {% if error %}
+        <div class="mb-4 p-4 bg-red-100 text-red-800 border border-red-300 rounded-lg">
+            {{ error }}
+        </div>
+        {% endif %}
+
         <!-- Submit Button -->
         <button type="submit"
             class="w-full bg-cyan-700 text-white py-3 rounded-xl font-semibold

@@ -12,5 +12,7 @@ urlpatterns = [
 
     path('logout/', views.logoutTenant, name='logoutTenant'),
 
+    path('payRent/', views.payRent, name='payRent'),
+
 ]
 
