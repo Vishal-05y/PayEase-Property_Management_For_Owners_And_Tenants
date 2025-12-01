@@ -10,6 +10,9 @@ urlpatterns = [
 
     path('allFlats/', views.allFlats, name='allFlats'),
 
+    path('flat/<int:flat_id>/', views.flatDetails, name='flatDetails'),
+
+
     path('logout/', views.logoutTenant, name='logoutTenant'),
 
 
@@ -17,6 +20,8 @@ urlpatterns = [
     path('payRent/', views.payRent, name='payRent'),
 
     path('rentHistory/', views.rentHistory, name='rentHistory'),
+
+    path('flat/<int:flat_id>/transactions/', views.tenantFlatTransactions, name='tenantFlatTransactions'),
 
     path('processPayment/', views.processPayment, name='processPayment'),
     

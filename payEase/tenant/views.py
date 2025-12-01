@@ -70,11 +70,28 @@ def allFlats(request):
 
 def flatDetails(request, flat_id):
     phone = request.session.get('tenant_phone')
-
     if not phone:
         return redirect('loginTenant')
-    
-    details = Flat.objects.get(phone=phone, flat_id=flat_id)
+
+    # Get all stay records of this tenant for this flat
+    stays = Tenant.objects.filter(
+        phone=phone,
+        flat_id=flat_id
+    ).order_by('-date_added')
+
+    if not stays.exists():
+        return HttpResponse("You never stayed in this flat.")
+
+    # Latest stay record for this flat
+    stay = stays.first()
+
+    return render(request, 'tenant/flatDetails.html', {
+        'stay': stay,          # tenant-flat relationship
+        'flat': stay.flat,     # flat details
+        'building': stay.flat.building,
+        'owner': stay.flat.building.owner,
+    })
+
 
 
 def payRent(request):
@@ -166,6 +183,37 @@ def rentHistory(request):
         'tenant': tenant,
         'payments': payments
     })
+
+
+def tenantFlatTransactions(request, flat_id):
+    phone = request.session.get('tenant_phone')
+    if not phone:
+        return redirect('loginTenant')
+
+    # Get tenant stays for this flat (past or present)
+    stays = Tenant.objects.filter(phone=phone, flat_id=flat_id)
+
+    if not stays.exists():
+        return HttpResponse("You have no stay records for this flat.")
+
+    # Get all payments tenant made for this flat
+    payments = RentPayment.objects.filter(
+        tenant__phone=phone,
+        flat_id=flat_id
+    ).order_by('-id')
+
+    # For page display
+    flat = stays.first().flat
+    building = flat.building
+    owner = building.owner
+
+    return render(request, "tenant/flatTransactions.html", {
+        "flat": flat,
+        "building": building,
+        "owner": owner,
+        "payments": payments
+    })
+
 
 
 def logoutTenant(request):
