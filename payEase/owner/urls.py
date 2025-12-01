@@ -26,5 +26,9 @@ urlpatterns = [
 
     path('logout/', views.logoutOwner, name='logoutOwner'),
 
+
+    path('buildings/<int:building_id>/flat/<int:flat_id>/tenant/payment-history/', views.tenantPaymentHistory, name='tenantPaymentHistory'),
+
+
 ]
 

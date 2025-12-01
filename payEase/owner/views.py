@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.utils import timezone
 from .models import Owner, Building, Flat
-from tenant.models import Tenant
 from .forms import SignUpOwnerForm, LoginOwnerForm, BuildingForm, FlatForm, addTenantForm
+
+from tenant.models import Tenant, RentPayment
 
 def ownerHome(request):
     return render(request, 'owner/ownerHome.html')
@@ -69,6 +70,8 @@ def logoutOwner(request):
 
 # -------------------- DASHBOARD --------------------
 
+from datetime import datetime
+
 def ownerDashboard(request):
     phone = request.session.get('owner_phone')
     if not phone:
@@ -83,6 +86,31 @@ def ownerDashboard(request):
 
     occupied = Tenant.objects.filter(flat__building__owner=owner).values('flat').distinct().count()
 
+    # 🔹 Current month name
+    current_month = datetime.now().strftime("%B %Y")
+
+    # 🔹 Get all latest tenants in each flat
+    tenants = Tenant.objects.filter(
+        flat__building__owner=owner
+    ).order_by('flat_id', '-date_added')
+
+    latest_tenants = {}  # key = flat_id, value = tenant object
+    for t in tenants:
+        if t.flat_id not in latest_tenants:
+            latest_tenants[t.flat_id] = t
+
+    # 🔹 Find tenants who have NOT paid this month
+    unpaid_tenants = []
+    for tenant in latest_tenants.values():
+        paid = RentPayment.objects.filter(
+            tenant=tenant,
+            month=current_month,
+            status="PAID"
+        ).exists()
+
+        if not paid:
+            unpaid_tenants.append(tenant)
+
     return render(request, "owner/ownerDashboard.html", {
         "owner": owner,
         "buildings": buildings,
@@ -90,7 +118,12 @@ def ownerDashboard(request):
         "total_flats": flats.count(),
         "occupied_flats": occupied,
         "vacant_flats": flats.count() - occupied,
+
+        # ⭐ Add unpaid tenants
+        "unpaid_tenants": unpaid_tenants,
+        "current_month": current_month,
     })
+
 
 
 # -------------------- ADD BUILDING --------------------
@@ -158,16 +191,18 @@ def addFlat(request, building_id):
         if form.is_valid():
             flat_number = form.cleaned_data['flat_number']
 
-            if Flat.objects.filter(flat_number=flat_number).exists():
-                return render(request, 'flat/addflat.html', {
+            # Duplicate check for FLATS inside the SAME BUILDING
+            if Flat.objects.filter(building=building, flat_number=flat_number).exists():
+                return render(request, 'flat/addFlat.html', {
                     'form': form,
                     'building': building,
-                    'error': "Flat already exists. Try to add new flat."
+                    'error': "This flat number already exists in this building. Try a different flat number."
                 })
-            
+
             flat = form.save(commit=False)
             flat.building = building
             flat.save()
+
             return redirect('buildingDetails', building_id=building_id)
 
     else:
@@ -282,4 +317,36 @@ def pastTenants(request, building_id, flat_id):
     return render(request, 'tenant/pastTenants.html', {
         'flat': flat,
         'tenants': past
+    })
+
+
+
+def tenantPaymentHistory(request, building_id, flat_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    # Validate flat belongs to this owner
+    flat = get_object_or_404(
+        Flat,
+        id=flat_id,
+        building_id=building_id,
+        building__owner__phone=phone
+    )
+
+    # Latest active tenant
+    tenant = flat.tenants.order_by('-date_added').first()
+
+    if not tenant:
+        payments = []
+    else:
+        payments = RentPayment.objects.filter(
+            tenant=tenant,
+            flat=flat
+        ).order_by('-date_paid')
+
+    return render(request, 'tenant/tenantPaymentHistory.html', {
+        'flat': flat,
+        'tenant': tenant,
+        'payments': payments,
     })
