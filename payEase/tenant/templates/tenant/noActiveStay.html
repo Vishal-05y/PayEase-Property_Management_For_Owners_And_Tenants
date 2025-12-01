@@ -1,0 +1,47 @@
+{% extends "base/tenant_layout.html" %}
+
+{% block title %}No Active Stay{% endblock %}
+
+{% block navbar %}
+<a href="{% url 'tenantDashboard' %}" class="text-white hover:text-cyan-300 transition">Dashboard</a>
+
+<a href="{% url 'logoutTenant' %}">
+    <button class="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800 transition">
+        Logout
+    </button>
+</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="max-w-2xl mx-auto mt-24 px-6 text-center">
+
+    <!-- Title -->
+    <h1 class="text-4xl font-extrabold text-cyan-900">
+        No Active Stay Found
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="mt-4 text-lg text-gray-700 leading-relaxed">
+        It looks like you're not staying in any flat currently.  
+        If this is unexpected, please contact your building owner.
+    </p>
+
+    <!-- Action Button -->
+    <div class="mt-10">
+        <a href="{% url 'allFlats' %}">
+            <button class="px-8 py-3 bg-cyan-700 text-white rounded-xl font-semibold 
+                           hover:bg-cyan-800 transition shadow">
+                View Past Flats
+            </button>
+        </a>
+    </div>
+
+    <!-- Friendly Note -->
+    <p class="mt-6 text-sm text-gray-500">
+        New place, new beginnings — find your next home!
+    </p>
+
+</div>
+
+{% endblock %}

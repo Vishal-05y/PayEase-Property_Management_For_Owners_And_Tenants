@@ -28,10 +28,15 @@
     </div>
 
     <!-- Right: Action Buttons -->
-    <div class="space-x-3">
+    <div class="space-x-2">
+        <a href="{% url 'removeTenant' flat.building.id flat.id %}">
+            <button class="px-5 py-2.5 bg-red-400 text-white rounded-lg shadow hover:bg-red-900 transition font-semibold">
+                Remove Tenant
+            </button>
+        </a>
         <a href="{% url 'addTenant' flat.building.id flat.id %}">
             <button class="px-5 py-2.5 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-900 transition font-semibold">
-                + Add Tenant
+                Add Tenant
             </button>
         </a>
 
@@ -78,13 +83,12 @@
     </div>
 
     <!-- Payment History Button -->
+    <!-- Payment History Button -->
     <a href="{% url 'tenantPaymentHistory' flat.building.id flat.id %}">
         <button class="px-6 py-3 w-full bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-800 transition font-semibold">
             Payment History
         </button>
     </a>
-
-
 </div>
 
 {% else %}

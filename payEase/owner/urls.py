@@ -20,6 +20,8 @@ urlpatterns = [
 
     path('buildings/<int:building_id>/flat/<int:flat_id>/addTenant/', views.addTenant, name='addTenant'),
 
+    path('buildings/<int:building_id>/flat/<int:flat_id>/remove/', views.removeTenant, name='removeTenant'),
+
     path('buildings/<int:building_id>/flat/<int:flat_id>/pastTenants/', views.pastTenants, name='pastTenants'),
 
     path('buildings/<int:building_id>/flat/<int:flat_id>/tenant/<int:tenant_id>/', views.tenantDetails, name='tenantDetails'),

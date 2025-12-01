@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import loginTenantForm
-from .models import Tenant, RentPayment
+from .models import Tenant, RentPayment, Flat
 from django.http import HttpResponse
 from datetime import datetime
 
@@ -17,14 +17,11 @@ def loginTenant(request):
             name = form.cleaned_data['name']
             phone = form.cleaned_data['phone']
 
-            # Get latest tenant entry for this person
-            tenant = Tenant.objects.filter(name=name, phone=phone).order_by('-date_added').first()
+            # Tenant can login even if inactive (he may not be staying anywhere now)
+            tenant_exists = Tenant.objects.filter(name=name, phone=phone).exists()
 
-            if tenant:
-                # Store phone in session
+            if tenant_exists:
                 request.session['tenant_phone'] = phone
-
-                # Instead of going to dashboard → check due first
                 return redirect('tenantCheckDue')
 
             return render(request, 'tenant/loginTenant.html', {
@@ -40,22 +37,21 @@ def loginTenant(request):
     })
 
 
-
 def tenantDashboard(request):
     phone = request.session.get('tenant_phone')
-
     if not phone:
         return redirect('loginTenant')
 
-    tenants = Tenant.objects.filter(phone=phone).select_related('flat', 'flat__building').order_by('-date_added')
+    tenant = Tenant.objects.filter(
+        phone=phone,
+        is_active=True
+    ).order_by('-date_added').first()
 
-    if not tenants.exists():
-        return HttpResponse("Tenant not found")
-
-    latest_flat = tenants.first()
+    if not tenant:
+        return render(request, "tenant/noActiveStay.html")
 
     return render(request, 'tenant/tenantDashboard.html', {
-        'tenant': latest_flat,
+        'tenant': tenant
     })
 
 
@@ -72,6 +68,13 @@ def allFlats(request):
     })
 
 
+def flatDetails(request, flat_id):
+    phone = request.session.get('tenant_phone')
+
+    if not phone:
+        return redirect('loginTenant')
+    
+    details = Flat.objects.get(phone=phone, flat_id=flat_id)
 
 
 def payRent(request):
@@ -79,9 +82,13 @@ def payRent(request):
     if not phone:
         return redirect('loginTenant')
 
-    tenant = Tenant.objects.filter(phone=phone).order_by('-date_added').first()
+    tenant = Tenant.objects.filter(
+        phone=phone,
+        is_active=True
+    ).order_by('-date_added').first()
+
     if not tenant:
-        return HttpResponse("Tenant not found")
+        return render(request, "tenant/noActiveStay.html")
 
     current_month = datetime.now().strftime("%B %Y")
 
@@ -127,14 +134,16 @@ def processPayment(request):
     return redirect('paymentSuccess')
 
 
-
 def paymentSuccess(request):
     phone = request.session.get('tenant_phone')
-    tenant = Tenant.objects.filter(phone=phone).order_by('-date_added').first()
+    tenant = Tenant.objects.filter(phone=phone, is_active=True).first()
+
+    if not tenant:
+        return render(request, "tenant/noActiveStay.html")
 
     last_payment = RentPayment.objects.filter(
         tenant=tenant
-    ).order_by('-date_paid').first()
+    ).order_by('-id').first()
 
     return render(request, 'tenant/paymentSuccess.html', {
         'tenant': tenant,
@@ -144,7 +153,10 @@ def paymentSuccess(request):
 
 def rentHistory(request):
     phone = request.session.get('tenant_phone')
-    tenant = Tenant.objects.filter(phone=phone).order_by('-date_added').first()
+    tenant = Tenant.objects.filter(phone=phone, is_active=True).first()
+
+    if not tenant:
+        return render(request, "tenant/noActiveStay.html")
 
     payments = RentPayment.objects.filter(
         tenant=tenant
@@ -161,32 +173,30 @@ def logoutTenant(request):
     return redirect('loginTenant')
 
 
-
 def tenantCheckDue(request):
     phone = request.session.get('tenant_phone')
     if not phone:
         return redirect('loginTenant')
 
-    # latest tenant
-    tenant = Tenant.objects.filter(phone=phone).order_by('-date_added').first()
+    # Find active stay
+    tenant = Tenant.objects.filter(phone=phone, is_active=True).order_by('-date_added').first()
 
     if not tenant:
-        return HttpResponse("Tenant not found")
+        # No active flat
+        return render(request, "tenant/noActiveStay.html")
 
-    # current month
     current_month = datetime.now().strftime("%B %Y")
 
-    # has he paid?
-    paid = RentPayment.objects.filter(
+    already_paid = RentPayment.objects.filter(
         tenant=tenant,
         month=current_month,
         status="PAID"
     ).exists()
 
-    if paid:
+    if already_paid:
         return redirect('tenantDashboard')
 
-    # show due alert
+    # Rent is due
     return render(request, "tenant/rentDuePrompt.html", {
         "tenant": tenant,
         "current_month": current_month

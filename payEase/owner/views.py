@@ -83,24 +83,30 @@ def ownerDashboard(request):
     buildings = Building.objects.filter(owner=owner)
     flats = Flat.objects.filter(building__owner=owner)
 
-    occupied = Tenant.objects.filter(flat__building__owner=owner).values('flat').distinct().count()
+    # Count only ACTIVE tenants
+    occupied = Tenant.objects.filter(
+        flat__building__owner=owner, 
+        is_active=True
+    ).values('flat').distinct().count()
 
-    # 🔹 Current month name
+    # Current month
     current_month = datetime.now().strftime("%B %Y")
 
-    # 🔹 Get all latest tenants in each flat
-    tenants = Tenant.objects.filter(
-        flat__building__owner=owner
+    # Get all ACTIVE tenants only
+    active_tenants = Tenant.objects.filter(
+        flat__building__owner=owner,
+        is_active=True
     ).order_by('flat_id', '-date_added')
 
-    latest_tenants = {}  # key = flat_id, value = tenant object
-    for t in tenants:
-        if t.flat_id not in latest_tenants:
-            latest_tenants[t.flat_id] = t
+    # Only 1 active tenant per flat → safe
+    latest_active_tenants = {}
+    for t in active_tenants:
+        if t.flat_id not in latest_active_tenants:
+            latest_active_tenants[t.flat_id] = t
 
-    # 🔹 Find tenants who have NOT paid this month
+    # Find unpaid tenants from ACTIVE ones
     unpaid_tenants = []
-    for tenant in latest_tenants.values():
+    for tenant in latest_active_tenants.values():
         paid = RentPayment.objects.filter(
             tenant=tenant,
             month=current_month,
@@ -115,14 +121,15 @@ def ownerDashboard(request):
         "buildings": buildings,
         "total_buildings": buildings.count(),
         "total_flats": flats.count(),
+
+        # Only count active tenants
         "occupied_flats": occupied,
         "vacant_flats": flats.count() - occupied,
 
-        # ⭐ Add unpaid tenants
+        # Show unpaid tenants for this month
         "unpaid_tenants": unpaid_tenants,
         "current_month": current_month,
     })
-
 
 
 # -------------------- ADD BUILDING --------------------
@@ -178,11 +185,10 @@ def buildingDetails(request, building_id):
     unpaid_tenants = []
 
     for flat in flats:
-        # Get latest tenant for this flat
-        latest_tenant = flat.tenants.order_by('-date_added').first()
+        # Only ACTIVE tenant for this flat
+        latest_tenant = flat.tenants.filter(is_active=True).order_by('-date_added').first()
 
         if latest_tenant:
-            # Check if they paid this month
             paid = RentPayment.objects.filter(
                 tenant=latest_tenant,
                 flat=flat,
@@ -199,7 +205,6 @@ def buildingDetails(request, building_id):
         'unpaid_tenants': unpaid_tenants,
         'current_month': current_month,
     })
-
 
 
 # -------------------- ADD FLAT --------------------
@@ -221,7 +226,7 @@ def addFlat(request, building_id):
                 return render(request, 'flat/addFlat.html', {
                     'form': form,
                     'building': building,
-                    'error': "This flat number already exists in this building. Try a different flat number."
+                    'error': "This flat number already exists in this building. Try to add a different flat number."
                 })
 
             flat = form.save(commit=False)
@@ -247,20 +252,22 @@ def flatDetails(request, building_id, flat_id):
         return redirect('loginOwner')
 
     flat = get_object_or_404(
-        Flat, id=flat_id,
+        Flat, 
+        id=flat_id,
         building_id=building_id,
         building__owner__phone=phone
     )
 
-    latest_tenant = flat.tenants.order_by('-date_added').first()
+    # Only ACTIVE tenant
+    tenant = flat.tenants.filter(is_active=True).order_by('-date_added').first()
 
     return render(request, 'flat/flatDetails.html', {
         'flat': flat,
-        'tenant': latest_tenant,
+        'tenant': tenant,
     })
 
 
-# -------------------- ADD TENANT (OWNER SIDE) --------------------
+# -------------------- ADD TENANT --------------------
 
 def addTenant(request, building_id, flat_id):
     phone = request.session.get('owner_phone')
@@ -268,7 +275,8 @@ def addTenant(request, building_id, flat_id):
         return redirect('loginOwner')
 
     flat = get_object_or_404(
-        Flat, id=flat_id,
+        Flat,
+        id=flat_id,
         building_id=building_id,
         building__owner__phone=phone
     )
@@ -277,21 +285,14 @@ def addTenant(request, building_id, flat_id):
         form = addTenantForm(request.POST)
 
         if form.is_valid():
-            name = form.cleaned_data['name']
-            tphone = form.cleaned_data['phone']
-            flat_price = form.cleaned_data['flat_price']
+            # 1. Deactivate existing active tenant (if any)
+            Tenant.objects.filter(flat=flat, is_active=True).update(is_active=False)
 
-            try:
-                existing = Tenant.objects.get(flat=flat, phone=tphone)
-                existing.name = name
-                existing.flat_price = flat_price
-                existing.date_added = timezone.now()
-                existing.save()
-
-            except Tenant.DoesNotExist:
-                tenant = form.save(commit=False)
-                tenant.flat = flat
-                tenant.save()
+            # 2. Create new tenant as active
+            tenant = form.save(commit=False)
+            tenant.flat = flat
+            tenant.is_active = True
+            tenant.save()
 
             return redirect('flatDetails', building_id=building_id, flat_id=flat_id)
 
@@ -302,6 +303,26 @@ def addTenant(request, building_id, flat_id):
         'form': form,
         'flat': flat
     })
+
+
+# -------------------- REMOVE TENANT --------------------
+
+def removeTenant(request, building_id, flat_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    flat = get_object_or_404(
+        Flat,
+        id=flat_id,
+        building_id=building_id,
+        building__owner__phone=phone
+    )
+
+    # Deactivate active tenant
+    Tenant.objects.filter(flat=flat, is_active=True).update(is_active=False)
+
+    return redirect('flatDetails', building_id=building_id, flat_id=flat_id)
 
 
 # -------------------- TENANT DETAILS --------------------

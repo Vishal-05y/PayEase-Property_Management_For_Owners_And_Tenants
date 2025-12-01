@@ -36,10 +36,10 @@
 
 </div>
 
-<h2 class="text-2xl font-bold text-red-800 mt-3 mb-4">
+
+<h2 class="text-2xl font-bold text-red-600 mt-3 mb-4">
     Unpaid Rent — {{ current_month }}
 </h2>
-
 
 {% if unpaid_tenants %}
     <div class="space-y-4 mb-5">
@@ -79,13 +79,13 @@
     </div>
 
 {% else %}
-    <p class="text-gray-600 text-lg mb-5">All tenants have paid rent for {{ current_month }}</p>
+    <p class="text-gray-800 text-lg mb-5">All tenants have paid rent for {{ current_month }}</p>
 {% endif %}
 
 
 
 <!-- Flats Header -->
-<h2 class="text-3xl font-bold text-cyan-900 mb-6">Flats in This Building</h2>
+<h2 class="text-3xl font-bold text-cyan-900 mb-6 mt-9">Available Flats</h2>
 
 <!-- Flats Grid -->
 {% if building.flats.all %}
