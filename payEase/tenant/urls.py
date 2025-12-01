@@ -6,9 +6,11 @@ urlpatterns = [
 
     path('loginTenant/', views.loginTenant, name='loginTenant'),
 
-    path('<int:phone>/dashboard', views.tenantDashboard, name='tenantDashboard'),
-    
-    path('<int:phone>/allFlats', views.allFlats, name='allFlats'),
+    path('dashboard/', views.tenantDashboard, name='tenantDashboard'),
 
-    path('<int:phone>/buildingsList/<int:building_id>/flat/<int:flat_id>/addTenant/', views.addTenant, name='addTenant'),
+    path('allFlats/', views.allFlats, name='allFlats'),
+
+    path('logout/', views.logoutTenant, name='logoutTenant'),
+
 ]
+

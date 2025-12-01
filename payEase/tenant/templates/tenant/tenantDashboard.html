@@ -2,6 +2,12 @@
 
 {% block title %}Tenant Dashboard{% endblock %}
 
+{% block navbar %}
+<a href="{% url 'logoutTenant' %}">
+    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
+</a>
+{% endblock %}
+
 {% block content %}
 
 <!-- Header + Button Row -->
@@ -10,7 +16,7 @@
         Welcome, {{ tenant.name }}
     </h1>
 
-    <a href="{% url 'allFlats' phone %}">
+    <a href="{% url 'allFlats' %}">
         <button class="px-5 py-3 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-800 transition font-semibold">
             All Flat Details
         </button>

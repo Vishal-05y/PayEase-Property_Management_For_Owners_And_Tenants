@@ -1,96 +1,105 @@
-from tenant.models import Tenant
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Building, Flat, Owner
-from .forms import BuildingForm, FlatForm, LoginOwnerForm, SignUpOwnerForm
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
+from django.utils import timezone
+from .models import Owner, Building, Flat
+from tenant.models import Tenant
+from .forms import SignUpOwnerForm, LoginOwnerForm, BuildingForm, FlatForm, addTenantForm
 
-# Create your views here.
 def ownerHome(request):
     return render(request, 'owner/ownerHome.html')
 
 
+# -------------------- SIGNUP --------------------
+
 def signUpOwner(request):
     if request.method == 'POST':
         form = SignUpOwnerForm(request.POST)
-        
+
         if form.is_valid():
             phone = form.cleaned_data['phone']
 
-            # Check if phone already registered
             if Owner.objects.filter(phone=phone).exists():
                 return render(request, 'owner/signUpOwner.html', {
                     'form': form,
-                    'error': "Number is already registered."
+                    'error': "Number already registered."
                 })
 
-            # If not exists → save
             form.save()
             return redirect('loginOwner')
 
     else:
         form = SignUpOwnerForm()
 
-    # DEFAULT RENDER
     return render(request, 'owner/signUpOwner.html', {'form': form})
 
+
+# -------------------- LOGIN --------------------
 
 def loginOwner(request):
     if request.method == 'POST':
         form = LoginOwnerForm(request.POST)
+
         if form.is_valid():
             name = form.cleaned_data['name']
             phone = form.cleaned_data['phone']
 
-            owner = Owner.objects.filter(name=name, phone=phone)
+            owner = Owner.objects.filter(name=name, phone=phone).first()
 
-            if owner.exists():
-                return redirect('ownerDashboard', phone=phone)
-            else:
-                return render(request, 'owner/loginOwner.html', {
-                    'form': form,
-                    'error': "No owner found with this phone number."
-                })
+            if owner:
+                request.session['owner_phone'] = phone
+                return redirect('ownerDashboard')
+
+            return render(request, 'owner/loginOwner.html', {
+                'form': form,
+                'error': "You are not registered."
+            })
+
     else:
         form = LoginOwnerForm()
 
     return render(request, 'owner/loginOwner.html', {'form': form})
 
 
-def ownerDashboard(request, phone):
+# -------------------- LOGOUT --------------------
 
-    # Get the owner using phone
+def logoutOwner(request):
+    request.session.flush()
+    return redirect('loginOwner')
+
+
+# -------------------- DASHBOARD --------------------
+
+def ownerDashboard(request):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
     owner = Owner.objects.filter(phone=phone).first()
-
     if not owner:
         return HttpResponse("Owner not found")
 
-    # Get buildings belonging to this owner ONLY
     buildings = Building.objects.filter(owner=owner)
-
-    # Flats inside owner buildings
     flats = Flat.objects.filter(building__owner=owner)
 
-    # Occupied flats (which have tenants)
-    occupied_flats = Tenant.objects.filter(flat__building__owner=owner).values('flat').distinct().count()
-
-    total_buildings = buildings.count()
-    total_flats = flats.count()
-    vacant_flats = total_flats - occupied_flats
+    occupied = Tenant.objects.filter(flat__building__owner=owner).values('flat').distinct().count()
 
     return render(request, "owner/ownerDashboard.html", {
         "owner": owner,
-        "phone": phone,
         "buildings": buildings,
-
-        # Stats only for this owner
-        "total_buildings": total_buildings,
-        "total_flats": total_flats,
-        "occupied_flats": occupied_flats,
-        "vacant_flats": vacant_flats,
+        "total_buildings": buildings.count(),
+        "total_flats": flats.count(),
+        "occupied_flats": occupied,
+        "vacant_flats": flats.count() - occupied,
     })
 
-    
-def addBuilding(request, phone):
+
+# -------------------- ADD BUILDING --------------------
+
+def addBuilding(request):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
     owner = get_object_or_404(Owner, phone=phone)
 
     if request.method == "POST":
@@ -99,28 +108,38 @@ def addBuilding(request, phone):
             building = form.save(commit=False)
             building.owner = owner
             building.save()
-            return redirect('ownerDashboard', phone)
+            return redirect('ownerDashboard')
+
     else:
         form = BuildingForm()
 
     return render(request, 'building/addBuilding.html', {
-        'form': form,
-        'owner': owner
+        'form': form
     })
 
 
-def buildingDetails(request, phone, building_id):
-    building = get_object_or_404(Building, pk=building_id)
-    flats = building.flats.all()
+# -------------------- BUILDING DETAILS --------------------
+
+def buildingDetails(request, building_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    building = get_object_or_404(Building, id=building_id, owner__phone=phone)
     return render(request, 'building/buildingDetails.html', {
         'building': building,
-        'flats': flats,
-        'phone':phone,
+        'flats': building.flats.all(),
     })
 
 
-def addFlat(request, phone, building_id):
-    building = get_object_or_404(Building, pk=building_id)
+# -------------------- ADD FLAT --------------------
+
+def addFlat(request, building_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    building = get_object_or_404(Building, id=building_id, owner__phone=phone)
 
     if request.method == "POST":
         form = FlatForm(request.POST)
@@ -128,39 +147,94 @@ def addFlat(request, phone, building_id):
             flat = form.save(commit=False)
             flat.building = building
             flat.save()
-            return redirect('ownerDashboard', phone)
+            return redirect('buildingDetails', building_id=building_id)
+
     else:
         form = FlatForm()
 
     return render(request, 'flat/addFlat.html', {
-        'phone': phone,
-        'form': form, 
+        'form': form,
         'building': building
     })
 
 
-def flatDetails(request, phone, building_id, flat_id):
-    flat = get_object_or_404(Flat, id=flat_id, building_id=building_id)
+# -------------------- FLAT DETAILS --------------------
 
-    # Get the most recent tenant for this flat
+def flatDetails(request, building_id, flat_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    flat = get_object_or_404(
+        Flat, id=flat_id,
+        building_id=building_id,
+        building__owner__phone=phone
+    )
+
     latest_tenant = flat.tenants.order_by('-date_added').first()
 
     return render(request, 'flat/flatDetails.html', {
-        'phone': phone,
         'flat': flat,
         'tenant': latest_tenant,
-        'building_id': building_id,   # IMPORTANT: add this
     })
 
 
+# -------------------- ADD TENANT (OWNER SIDE) --------------------
+
+def addTenant(request, building_id, flat_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    flat = get_object_or_404(
+        Flat, id=flat_id,
+        building_id=building_id,
+        building__owner__phone=phone
+    )
+
+    if request.method == "POST":
+        form = addTenantForm(request.POST)
+
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            tphone = form.cleaned_data['phone']
+            flat_price = form.cleaned_data['flat_price']
+
+            try:
+                existing = Tenant.objects.get(flat=flat, phone=tphone)
+                existing.name = name
+                existing.flat_price = flat_price
+                existing.date_added = timezone.now()
+                existing.save()
+
+            except Tenant.DoesNotExist:
+                tenant = form.save(commit=False)
+                tenant.flat = flat
+                tenant.save()
+
+            return redirect('flatDetails', building_id=building_id, flat_id=flat_id)
+
+    else:
+        form = addTenantForm()
+
+    return render(request, 'tenant/addTenant.html', {
+        'form': form,
+        'flat': flat
+    })
+
+
+# -------------------- TENANT DETAILS --------------------
+
 def tenantDetails(request, building_id, flat_id, tenant_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
 
-    # Get tenant using only valid fields
-    tenant = get_object_or_404(Tenant, id=tenant_id, flat_id=flat_id)
-
-    # Ensure tenant belongs to the correct building
-    if tenant.flat.building_id != building_id:
-        raise Http404("Tenant not in this building")
+    tenant = get_object_or_404(
+        Tenant, id=tenant_id, flat_id=flat_id,
+        flat__building_id=building_id,
+        flat__building__owner__phone=phone
+    )
 
     return render(request, 'tenant/tenantDetails.html', {
         'tenant': tenant,
@@ -169,15 +243,22 @@ def tenantDetails(request, building_id, flat_id, tenant_id):
     })
 
 
-def pastTenants(request, phone, building_id, flat_id):
-    flat = get_object_or_404(Flat, id=flat_id, building_id=building_id)
+# -------------------- PAST TENANTS --------------------
 
-    # Get the most recent tenant for this flat
-    past_tenants = Tenant.objects.filter(flat_id = flat_id).order_by('-date_added')
+def pastTenants(request, building_id, flat_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    flat = get_object_or_404(
+        Flat, id=flat_id,
+        building_id=building_id,
+        building__owner__phone=phone
+    )
+
+    past = Tenant.objects.filter(flat_id=flat_id).order_by('-date_added')
 
     return render(request, 'tenant/pastTenants.html', {
-        'phone': phone,
         'flat': flat,
-        'tenants': past_tenants,
-        'building_id': building_id,   # IMPORTANT: add this
+        'tenants': past
     })

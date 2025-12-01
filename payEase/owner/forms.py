@@ -1,5 +1,6 @@
 from django import forms
 from .models import Building, Flat, Owner
+from tenant.models import Tenant
 
 class SignUpOwnerForm(forms.ModelForm):
     class Meta:
@@ -22,3 +23,9 @@ class FlatForm(forms.ModelForm):
     class Meta:
         model = Flat
         fields = ['flat_number', 'flat_type']
+
+
+class addTenantForm(forms.ModelForm):
+    class Meta:
+        model = Tenant
+        fields = ['name', 'phone', 'flat_price']

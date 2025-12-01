@@ -12,12 +12,7 @@
     <nav class="bg-cyan-900 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
             <h1 class="text-white text-2xl font-semibold tracking-wide">PayEase</h1>
-
-            <div class="space-x-6">
-                {% comment %} <a href="{% url 'tenant_payments' %}" class="text-indigo-100 hover:text-white">Payments</a> {% endcomment %}
-                {% comment %} <a href="{% url 'tenant_profile' %}" class="text-indigo-100 hover:text-white">Profile</a> {% endcomment %}
-                {% comment %} <a href="{% url 'logout' %}" class="text-indigo-100 hover:text-white">Logout</a> {% endcomment %}
-            </div>
+            {% block navbar %}{% endblock %}
         </div>
     </nav>
 

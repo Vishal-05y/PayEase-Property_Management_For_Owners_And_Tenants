@@ -2,6 +2,14 @@
 
 {% block title %}Add Building{% endblock %}
 
+{% block navbar %}
+<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
+<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
+<a href="{% url 'logoutOwner' %}">
+    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
+</a>
+{% endblock %}
+
 {% block content %}
 
 <h1 class="text-3xl font-extrabold text-cyan-900 mb-8 text-center">
@@ -42,9 +50,7 @@
         {% endfor %}
 
         <!-- Submit -->
-        <button type="submit"
-            class="w-full bg-cyan-700 text-white py-3 rounded-xl font-semibold
-                   shadow hover:bg-cyan-800 transition">
+        <button type="submit" class="w-full bg-cyan-700 text-white py-3 rounded-xl font-semibold shadow hover:bg-cyan-800 transition">
             Save Building
         </button>
 

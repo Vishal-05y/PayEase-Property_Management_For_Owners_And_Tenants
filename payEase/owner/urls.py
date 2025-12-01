@@ -8,17 +8,23 @@ urlpatterns = [
 
     path('loginOwner/', views.loginOwner , name='loginOwner'),
 
-    path('<int:phone>/dashboard/', views.ownerDashboard, name='ownerDashboard'),
+    path('dashboard/', views.ownerDashboard, name='ownerDashboard'),
 
-    path('<int:phone>/building/add/', views.addBuilding, name='addBuilding'),
+    path('building/add/', views.addBuilding, name='addBuilding'),
 
-    path('<int:phone>/buildingsList/<int:building_id>/', views.buildingDetails, name='buildingDetails'),
+    path('buildings/<int:building_id>/', views.buildingDetails, name='buildingDetails'),
 
-    path('<int:phone>/buildings/<int:building_id>/addFlat/', views.addFlat, name='addFlat'),
+    path('buildings/<int:building_id>/addFlat/', views.addFlat, name='addFlat'),
 
-    path('<int:phone>/buildingsList/<int:building_id>/flat/<int:flat_id>/', views.flatDetails, name='flatDetails'),
+    path('buildings/<int:building_id>/flat/<int:flat_id>/', views.flatDetails, name='flatDetails'),
 
-    path('buildingsList/<int:building_id>/flat/<int:flat_id>/tenant/<int:tenant_id>/', views.tenantDetails, name='tenantDetails'),
-    
-    path('<int:phone>/buildingsList/<int:building_id>/flat/<int:flat_id>/pastTenants/', views.pastTenants, name='pastTenants'),
+    path('buildings/<int:building_id>/flat/<int:flat_id>/addTenant/', views.addTenant, name='addTenant'),
+
+    path('buildings/<int:building_id>/flat/<int:flat_id>/pastTenants/', views.pastTenants, name='pastTenants'),
+
+    path('buildings/<int:building_id>/flat/<int:flat_id>/tenant/<int:tenant_id>/', views.tenantDetails, name='tenantDetails'),
+
+    path('logout/', views.logoutOwner, name='logoutOwner'),
+
 ]
+

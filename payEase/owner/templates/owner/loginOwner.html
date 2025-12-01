@@ -14,9 +14,12 @@
         </h1>
 
         <!-- Error Message -->
-        {% if form.phone.errors %}
+        {% if error %}
         <div class="mb-6 p-4 rounded-lg bg-red-100 border border-red-300 text-red-800 font-medium">
-            {{ form.phone.errors.0 }}
+            {{ error }}
+            <a href="{% url 'signUpOwner' %}" class="underline text-cyan-800 font-semibold ml-1">
+                Register here
+            </a>
         </div>
         {% endif %}
 

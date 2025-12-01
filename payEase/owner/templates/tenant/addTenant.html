@@ -2,6 +2,14 @@
 
 {% block title %}Add Tenant{% endblock %}
 
+{% block navbar %}
+<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
+<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
+<a href="{% url 'logoutOwner' %}">
+    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
+</a>
+{% endblock %}
+
 {% block content %}
 
 <h2 class="text-3xl font-extrabold text-cyan-900 mb-6 text-center">

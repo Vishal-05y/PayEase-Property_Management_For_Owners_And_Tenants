@@ -2,6 +2,14 @@
 
 {% block title %}Flat Details{% endblock %}
 
+{% block navbar %}
+<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
+<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
+<a href="{% url 'logoutOwner' %}">
+    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
+</a>
+{% endblock %}
+
 {% block content %}
 
 <!-- Top Header Section -->
@@ -21,13 +29,13 @@
 
     <!-- Right: Action Buttons -->
     <div class="space-x-3">
-        <a href="{% url 'addTenant' phone flat.building.id flat.id %}">
+        <a href="{% url 'addTenant' flat.building.id flat.id %}">
             <button class="px-5 py-2.5 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-900 transition font-semibold">
                 + Add Tenant
             </button>
         </a>
 
-        <a href="{% url 'pastTenants' phone flat.building.id flat.id %}">
+        <a href="{% url 'pastTenants' flat.building.id flat.id %}">
             <button class="px-5 py-2.5 bg-gray-700 text-white rounded-lg shadow hover:bg-gray-900 transition font-semibold">
                 View Past Tenants
             </button>
