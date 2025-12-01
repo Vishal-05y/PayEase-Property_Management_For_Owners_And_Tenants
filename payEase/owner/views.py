@@ -358,7 +358,7 @@ def pastTenants(request, building_id, flat_id):
         building__owner__phone=phone
     )
 
-    past = Tenant.objects.filter(flat_id=flat_id).order_by('-date_added')
+    past = Tenant.objects.filter(is_active=False, flat_id=flat_id).order_by('-date_added')
 
     return render(request, 'tenant/pastTenants.html', {
         'flat': flat,
@@ -396,4 +396,63 @@ def tenantPaymentHistory(request, building_id, flat_id):
         'flat': flat,
         'tenant': tenant,
         'payments': payments,
+    })
+
+
+
+def tenantFullDetails(request, tenant_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    # Fetch tenant, but ensure the owner truly owns the building this tenant stayed in
+    tenant = get_object_or_404(
+        Tenant,
+        id=tenant_id,
+        flat__building__owner__phone=phone
+    )
+
+    payments = RentPayment.objects.filter(
+        tenant=tenant
+    ).order_by('-id')
+
+    flat = tenant.flat
+    building = flat.building
+    owner = building.owner
+
+    return render(request, 'tenant/tenantFullDetails.html', {
+        'tenant': tenant,
+        'payments': payments,
+        'flat': flat,
+        'building': building,
+        'owner': owner
+    })
+
+
+def tenantAllTransactions(request, tenant_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    # Ensure owner can only see their own tenant
+    tenant = get_object_or_404(
+        Tenant,
+        id=tenant_id,
+        flat__building__owner__phone=phone
+    )
+
+    payments = RentPayment.objects.filter(
+        tenant=tenant
+    ).order_by('-id')
+
+    flat = tenant.flat
+    building = flat.building
+    owner = building.owner
+
+    return render(request, 'tenant/tenantAllTransactions.html', {
+        'tenant': tenant,
+        'payments': payments,
+        'flat': flat,
+        'building': building,
+        'owner': owner
     })

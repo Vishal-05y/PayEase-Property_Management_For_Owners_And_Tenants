@@ -24,6 +24,10 @@ urlpatterns = [
 
     path('buildings/<int:building_id>/flat/<int:flat_id>/pastTenants/', views.pastTenants, name='pastTenants'),
 
+    path('tenant/<int:tenant_id>/details/', views.tenantFullDetails, name='tenantFullDetails'),
+
+    path('tenant/<int:tenant_id>/transactions/', views.tenantAllTransactions, name='tenantAllTransactions'),
+
     path('buildings/<int:building_id>/flat/<int:flat_id>/tenant/<int:tenant_id>/', views.tenantDetails, name='tenantDetails'),
 
     path('logout/', views.logoutOwner, name='logoutOwner'),
