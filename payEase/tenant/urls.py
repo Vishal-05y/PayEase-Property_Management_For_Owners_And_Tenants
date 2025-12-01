@@ -22,5 +22,7 @@ urlpatterns = [
     
     path('paymentSuccess/', views.paymentSuccess, name='paymentSuccess'),
 
+    path('checkDue/', views.tenantCheckDue, name='tenantCheckDue'),
+
 ]
 
