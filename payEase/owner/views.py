@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
-from django.utils import timezone
 from .models import Owner, Building, Flat, BuildingImage, FlatImage
 from .forms import SignUpOwnerForm, LoginOwnerForm, BuildingForm, FlatForm, addTenantForm
 from . import forms
@@ -13,7 +12,7 @@ def ownerHome(request):
     return render(request, 'owner/ownerHome.html')
 
 
-# -------------------- SIGNUP --------------------
+# -------------------- AUTHENTICATION --------------------
 
 def signUpOwner(request):
     if request.method == 'POST':
@@ -36,8 +35,6 @@ def signUpOwner(request):
 
     return render(request, 'owner/signUpOwner.html', {'form': form})
 
-
-# -------------------- LOGIN --------------------
 
 def loginOwner(request):
     if request.method == 'POST':
@@ -63,8 +60,6 @@ def loginOwner(request):
 
     return render(request, 'owner/loginOwner.html', {'form': form})
 
-
-# -------------------- LOGOUT --------------------
 
 def logoutOwner(request):
     request.session.flush()
@@ -134,7 +129,43 @@ def ownerDashboard(request):
     })
 
 
-# -------------------- ADD BUILDING --------------------
+# -------------------- BUILDING --------------------
+
+def buildingDetails(request, building_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    # Get building owned by this owner
+    building = get_object_or_404(Building, id=building_id, owner__phone=phone)
+
+    flats = building.flats.all()
+    current_month = datetime.now().strftime("%B %Y")
+
+    unpaid_tenants = []
+
+    for flat in flats:
+        # Only ACTIVE tenant for this flat
+        latest_tenant = flat.tenants.filter(is_active=True).order_by('-date_added').first()
+
+        if latest_tenant:
+            paid = RentPayment.objects.filter(
+                tenant=latest_tenant,
+                flat=flat,
+                month=current_month,
+                status="PAID"
+            ).exists()
+
+            if not paid:
+                unpaid_tenants.append(latest_tenant)
+
+    return render(request, 'building/buildingDetails.html', {
+        'building': building,
+        'flats': flats,
+        'unpaid_tenants': unpaid_tenants,
+        'current_month': current_month,
+    })
+
 
 def addBuilding(request):
     phone = request.session.get('owner_phone')
@@ -225,14 +256,6 @@ def addBuildingImage(request, building_id):
         return redirect('editBuilding', building_id=building.id)
 
 
-def clearUploadError(request):
-    if "upload_error" in request.session:
-        del request.session["upload_error"]
-    return HttpResponse("")  # return empty response
-
-
-# -------------------- DELETE BUILDING IMAGES --------------------
-
 def deleteBuildingImage(request, image_id):
     phone = request.session.get('owner_phone')
     if not phone:
@@ -244,7 +267,7 @@ def deleteBuildingImage(request, image_id):
     img.image.delete()  # Deletes file from media folder
     img.delete()
 
-    return redirect('editBuilding', building_id=building_id)
+    return redirect('buildingGallery', building_id=building_id)
 
 
 def buildingGallery(request, building_id):
@@ -278,47 +301,35 @@ def buildingGallery(request, building_id):
     })
 
 
+def clearUploadError(request):
+    if "upload_error" in request.session:
+        del request.session["upload_error"]
+    return HttpResponse("")  # return empty response
 
-# -------------------- BUILDING DETAILS --------------------
 
-def buildingDetails(request, building_id):
+
+# -------------------- FLAT --------------------
+
+def flatDetails(request, building_id, flat_id):
     phone = request.session.get('owner_phone')
     if not phone:
         return redirect('loginOwner')
 
-    # Get building owned by this owner
-    building = get_object_or_404(Building, id=building_id, owner__phone=phone)
+    flat = get_object_or_404(
+        Flat, 
+        id=flat_id,
+        building_id=building_id,
+        building__owner__phone=phone
+    )
 
-    flats = building.flats.all()
-    current_month = datetime.now().strftime("%B %Y")
+    # Only ACTIVE tenant
+    tenant = flat.tenants.filter(is_active=True).order_by('-date_added').first()
 
-    unpaid_tenants = []
-
-    for flat in flats:
-        # Only ACTIVE tenant for this flat
-        latest_tenant = flat.tenants.filter(is_active=True).order_by('-date_added').first()
-
-        if latest_tenant:
-            paid = RentPayment.objects.filter(
-                tenant=latest_tenant,
-                flat=flat,
-                month=current_month,
-                status="PAID"
-            ).exists()
-
-            if not paid:
-                unpaid_tenants.append(latest_tenant)
-
-    return render(request, 'building/buildingDetails.html', {
-        'building': building,
-        'flats': flats,
-        'unpaid_tenants': unpaid_tenants,
-        'current_month': current_month,
+    return render(request, 'flat/flatDetails.html', {
+        'flat': flat,
+        'tenant': tenant,
     })
 
-
-
-# -------------------- ADD FLAT --------------------
 
 def addFlat(request, building_id):
     phone = request.session.get('owner_phone')
@@ -355,54 +366,6 @@ def addFlat(request, building_id):
     })
 
 
-# -------------------- DELETE FLAT --------------------
-
-def deleteFlat(request, building_id, flat_id):
-    phone = request.session.get('owner_phone')
-    if not phone:
-        return JsonResponse({"success": False, "message": "You are not logged in."})
-
-    building = get_object_or_404(Building, id=building_id, owner__phone=phone)
-    flat = get_object_or_404(Flat, id=flat_id, building=building)
-
-    # Check if active tenant stays
-    if flat.tenants.filter(is_active=True).exists():
-        return JsonResponse({
-            "success": False,
-            "message": "This flat cannot be deleted because a tenant is currently occupying it. Please remove the tenant before attempting to delete the flat."
-        })
-
-    flat.delete()
-
-    return JsonResponse({
-        "success": True,
-        "message": "Flat deleted successfully."
-    })
-
-
-# -------------------- FLAT DETAILS --------------------
-
-def flatDetails(request, building_id, flat_id):
-    phone = request.session.get('owner_phone')
-    if not phone:
-        return redirect('loginOwner')
-
-    flat = get_object_or_404(
-        Flat, 
-        id=flat_id,
-        building_id=building_id,
-        building__owner__phone=phone
-    )
-
-    # Only ACTIVE tenant
-    tenant = flat.tenants.filter(is_active=True).order_by('-date_added').first()
-
-    return render(request, 'flat/flatDetails.html', {
-        'flat': flat,
-        'tenant': tenant,
-    })
-
-
 def editFlat(request, building_id, flat_id):
     phone = request.session.get('owner_phone')
     if not phone:
@@ -427,6 +390,29 @@ def editFlat(request, building_id, flat_id):
     return render(request, "flat/editFlat.html", {
         "flat": flat,
         "form": form,
+    })
+
+
+def deleteFlat(request, building_id, flat_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return JsonResponse({"success": False, "message": "You are not logged in."})
+
+    building = get_object_or_404(Building, id=building_id, owner__phone=phone)
+    flat = get_object_or_404(Flat, id=flat_id, building=building)
+
+    # Check if active tenant stays
+    if flat.tenants.filter(is_active=True).exists():
+        return JsonResponse({
+            "success": False,
+            "message": "This flat cannot be deleted because a tenant is currently occupying it. Please remove the tenant before attempting to delete the flat."
+        })
+
+    flat.delete()
+
+    return JsonResponse({
+        "success": True,
+        "message": "Flat deleted successfully."
     })
 
 
@@ -478,8 +464,7 @@ def deleteFlatImage(request, image_id):
     return redirect("flatGallery", building_id=building_id, flat_id=flat.id)
 
 
-
-# -------------------- ADD TENANT --------------------
+# -------------------- TENANT --------------------
 
 def addTenant(request, building_id, flat_id):
     phone = request.session.get('owner_phone')
@@ -517,8 +502,6 @@ def addTenant(request, building_id, flat_id):
     })
 
 
-# -------------------- REMOVE TENANT --------------------
-
 def removeTenant(request, building_id, flat_id):
     phone = request.session.get('owner_phone')
     if not phone:
@@ -536,8 +519,6 @@ def removeTenant(request, building_id, flat_id):
 
     return redirect('flatDetails', building_id=building_id, flat_id=flat_id)
 
-
-# -------------------- TENANT DETAILS --------------------
 
 def tenantDetails(request, building_id, flat_id, tenant_id):
     phone = request.session.get('owner_phone')
@@ -557,8 +538,6 @@ def tenantDetails(request, building_id, flat_id, tenant_id):
     })
 
 
-# -------------------- PAST TENANTS --------------------
-
 def pastTenants(request, building_id, flat_id):
     phone = request.session.get('owner_phone')
     if not phone:
@@ -577,6 +556,34 @@ def pastTenants(request, building_id, flat_id):
         'tenants': past
     })
 
+
+def tenantFullDetails(request, tenant_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    # Fetch tenant, but ensure the owner truly owns the building this tenant stayed in
+    tenant = get_object_or_404(
+        Tenant,
+        id=tenant_id,
+        flat__building__owner__phone=phone
+    )
+
+    payments = RentPayment.objects.filter(
+        tenant=tenant
+    ).order_by('-id')
+
+    flat = tenant.flat
+    building = flat.building
+    owner = building.owner
+
+    return render(request, 'tenant/tenantFullDetails.html', {
+        'tenant': tenant,
+        'payments': payments,
+        'flat': flat,
+        'building': building,
+        'owner': owner
+    })
 
 
 def tenantPaymentHistory(request, building_id, flat_id):
@@ -608,36 +615,6 @@ def tenantPaymentHistory(request, building_id, flat_id):
         'flat': flat,
         'tenant': tenant,
         'payments': payments,
-    })
-
-
-
-def tenantFullDetails(request, tenant_id):
-    phone = request.session.get('owner_phone')
-    if not phone:
-        return redirect('loginOwner')
-
-    # Fetch tenant, but ensure the owner truly owns the building this tenant stayed in
-    tenant = get_object_or_404(
-        Tenant,
-        id=tenant_id,
-        flat__building__owner__phone=phone
-    )
-
-    payments = RentPayment.objects.filter(
-        tenant=tenant
-    ).order_by('-id')
-
-    flat = tenant.flat
-    building = flat.building
-    owner = building.owner
-
-    return render(request, 'tenant/tenantFullDetails.html', {
-        'tenant': tenant,
-        'payments': payments,
-        'flat': flat,
-        'building': building,
-        'owner': owner
     })
 
 

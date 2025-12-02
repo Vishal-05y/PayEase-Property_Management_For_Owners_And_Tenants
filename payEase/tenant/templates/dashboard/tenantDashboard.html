@@ -1,0 +1,124 @@
+{% extends "base/tenant_layout.html" %}
+
+{% block title %}Tenant Dashboard{% endblock %}
+
+{% block navbar %}
+<a href="{% url 'tenantDashboard' %}"  class="text-white hover:text-cyan-300 transition">Dashboard</a>
+<a href="{% url 'logoutTenant' %}">
+    <button class="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800 transition">
+        Logout
+    </button>
+</a>
+{% endblock %}
+
+{% block content %}
+
+<!-- Header + Actions -->
+<div class="flex items-center justify-between mb-10">
+    <h1 class="text-4xl font-extrabold text-cyan-900 tracking-tight">
+        Welcome, {{ tenant.name }}
+    </h1>
+
+    <div class="flex space-x-4">
+
+        <!-- Pay Rent Button -->
+        <a href="{% url 'payRent' %}">
+            <button class="px-5 py-3 bg-green-700 text-white rounded-lg 
+                           shadow hover:bg-green-800 transition font-semibold">
+                Pay Rent
+            </button>
+        </a>
+
+        <!-- All Flats Button -->
+        <a href="{% url 'allFlats' %}">
+            <button class="px-5 py-3 bg-cyan-700 text-white rounded-lg 
+                           shadow hover:bg-cyan-800 transition font-semibold">
+                All Flat Details
+            </button>
+        </a>
+
+    </div>
+</div>
+
+
+<!-- Tenant Information Card -->
+<div class="max-w-xl mx-auto bg-cyan-50 border border-cyan-300 
+            rounded-xl shadow-lg p-8 space-y-6">
+
+    <!-- Building Name -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Building Name</p>
+        <p class="text-xl font-bold text-cyan-900 mt-1">{{ tenant.flat.building.name }}</p>
+    </div>
+
+    <!-- Owner -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Owner Name</p>
+        <p class="text-xl font-bold text-cyan-900 mt-1">{{ tenant.flat.building.owner.name }}</p>
+    </div>
+
+    <!-- Address -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Building Address</p>
+        <p class="text-xl font-bold text-cyan-900 mt-1">{{ tenant.flat.building.address }}</p>
+    </div>
+
+    <!-- Flat Number -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Flat Number</p>
+        <p class="text-xl font-bold text-cyan-900 mt-1">{{ tenant.flat.flat_number }}</p>
+    </div>
+
+    <!-- Flat Type -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Flat Type</p>
+        <p class="text-xl font-bold text-cyan-900 mt-1">{{ tenant.flat.flat_type }}</p>
+    </div>
+
+    <!-- Joined -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Date Joined</p>
+        <p class="text-xl font-bold text-cyan-900 mt-1">{{ tenant.date_added|date:"F j, Y" }}</p>
+    </div>
+
+    <!-- Rent -->
+    <div>
+        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Rent</p>
+        <p class="text-xl font-bold text-cyan-900 mt-1">₹{{ tenant.flat_price }}</p>
+    </div>
+
+</div>
+
+
+<!-- Bottom Buttons -->
+<div class="max-w-xl mx-auto mt-8 space-y-4">
+
+    <!-- Payment History -->
+    <a href="{% url 'rentHistory' %}">
+        <button class="w-full px-6 py-3 bg-cyan-700 text-white rounded-lg 
+                       shadow hover:bg-cyan-800 transition font-semibold">
+            Payment History
+        </button>
+    </a>
+
+    <!-- Gallery Buttons -->
+    <div class="flex justify-between mt-5">
+
+        <a href="{% url 'tenantBuildingGallery' %}" class="w-1/2 mr-2">
+            <button class="w-full px-6 py-3 bg-cyan-700 text-white rounded-lg shadow 
+                           hover:bg-cyan-800 transition font-semibold">
+                Building Gallery
+            </button>
+        </a>
+
+        <a href="{% url 'tenantFlatGallery' %}" class="w-1/2 ml-2">
+            <button class="w-full px-6 py-3 bg-cyan-700 text-white rounded-lg shadow 
+                           hover:bg-cyan-800 transition font-semibold">
+                Flat Gallery
+            </button>
+        </a>
+
+    </div>
+</div>
+
+{% endblock %}

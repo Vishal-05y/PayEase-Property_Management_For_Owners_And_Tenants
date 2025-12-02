@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from .forms import loginTenantForm
-from .models import Tenant, RentPayment, Flat
+from .models import Tenant, RentPayment
 from django.http import HttpResponse
 from datetime import datetime
 from django.contrib import messages
@@ -10,6 +10,7 @@ from django.contrib import messages
 def tenantHome(request):
     return render(request, 'tenant/tenantHome.html')
 
+# -------------------- AUTHENTICATION --------------------
 
 def loginTenant(request):
     if request.method == 'POST':
@@ -26,7 +27,7 @@ def loginTenant(request):
                 request.session['tenant_phone'] = phone
                 return redirect('tenantCheckDue')
 
-            return render(request, 'tenant/loginTenant.html', {
+            return render(request, '/authentication/loginTenant.html', {
                 'form': form,
                 'error': "You are not registered yet. Please contact your owner."
             })
@@ -34,10 +35,17 @@ def loginTenant(request):
     else:
         form = loginTenantForm()
 
-    return render(request, 'tenant/loginTenant.html', {
+    return render(request, 'authentication/loginTenant.html', {
         'form': form
     })
 
+
+def logoutTenant(request):
+    request.session.flush()
+    return redirect('loginTenant')
+
+
+# -------------------- DASHBOARD --------------------
 
 def tenantDashboard(request):
     phone = request.session.get('tenant_phone')
@@ -50,36 +58,37 @@ def tenantDashboard(request):
     ).order_by('-date_added').first()
 
     if not tenant:
-        return render(request, "tenant/noActiveStay.html")
+        return render(request, "dashboard/noActiveStay.html")
 
-    return render(request, 'tenant/tenantDashboard.html', {
+    return render(request, 'dashboard/tenantDashboard.html', {
         'tenant': tenant
     })
 
 
-def allFlats(request):
-    phone = request.session.get('tenant_phone')
+# -------------------- BUILDING --------------------
 
+def tenantBuildingGallery(request):
+    phone = request.session.get('tenant_phone')
     if not phone:
         return redirect('loginTenant')
 
-    tenants = Tenant.objects.filter(
-        is_active=False,
-        phone=phone
-    ).select_related('flat', 'flat__building').order_by('-date_added')
+    tenant = Tenant.objects.filter(
+        phone=phone,
+        is_active=True
+    ).order_by('-date_added').first()
 
-    # If tenant has no flats
-    if not tenants.exists():
-        messages.info(request, "You do not have any previous flats.")
-        return render(request, 'tenant/allFlats.html', {
-            'tenant': [],
-        })
+    if not tenant:
+        return redirect('tenantDashboard')
 
-    return render(request, 'tenant/allFlats.html', {
-        'tenant': tenants,
+    building = tenant.flat.building  
+
+    return render(request, "building/tenantBuildingGallery.html", {
+        "building": building,
+        "images": building.images.all()
     })
 
 
+# -------------------- FLAT --------------------
 
 def flatDetails(request, flat_id):
     phone = request.session.get('tenant_phone')
@@ -98,7 +107,7 @@ def flatDetails(request, flat_id):
     # Latest stay record for this flat
     stay = stays.first()
 
-    return render(request, 'tenant/flatDetails.html', {
+    return render(request, 'flat/flatDetails.html', {
         'stay': stay,          # tenant-flat relationship
         'flat': stay.flat,     # flat details
         'building': stay.flat.building,
@@ -106,6 +115,51 @@ def flatDetails(request, flat_id):
     })
 
 
+def allFlats(request):
+    phone = request.session.get('tenant_phone')
+
+    if not phone:
+        return redirect('loginTenant')
+
+    tenants = Tenant.objects.filter(
+        is_active=False,
+        phone=phone
+    ).select_related('flat', 'flat__building').order_by('-date_added')
+
+    # If tenant has no flats
+    if not tenants.exists():
+        messages.info(request, "You do not have any previous flats.")
+        return render(request, 'flat/allFlats.html', {
+            'tenant': [],
+        })
+
+    return render(request, 'flat/allFlats.html', {
+        'tenant': tenants,
+    })
+
+
+def tenantFlatGallery(request):
+    phone = request.session.get('tenant_phone')
+    if not phone:
+        return redirect('loginTenant')
+
+    tenant = Tenant.objects.filter(
+        phone=phone,
+        is_active=True
+    ).order_by('-date_added').first()
+
+    if not tenant:
+        return redirect('tenantDashboard')
+
+    flat = tenant.flat
+
+    return render(request, "flat/tenantFlatGallery.html", {
+        "flat": flat,
+        "images": flat.images.all()
+    })
+
+
+# -------------------- PAYMENT --------------------
 
 def payRent(request):
     phone = request.session.get('tenant_phone')
@@ -118,7 +172,7 @@ def payRent(request):
     ).order_by('-date_added').first()
 
     if not tenant:
-        return render(request, "tenant/noActiveStay.html")
+        return render(request, "dashboard/noActiveStay.html")
 
     current_month = datetime.now().strftime("%B %Y")
 
@@ -128,7 +182,7 @@ def payRent(request):
         status="PAID"
     ).exists()
 
-    return render(request, 'tenant/payRent.html', {
+    return render(request, 'payment/payRent.html', {
         'tenant': tenant,
         'current_month': current_month,
         'already_paid': already_paid
@@ -169,13 +223,13 @@ def paymentSuccess(request):
     tenant = Tenant.objects.filter(phone=phone, is_active=True).first()
 
     if not tenant:
-        return render(request, "tenant/noActiveStay.html")
+        return render(request, "dashboard/noActiveStay.html")
 
     last_payment = RentPayment.objects.filter(
         tenant=tenant
     ).order_by('-id').first()
 
-    return render(request, 'tenant/paymentSuccess.html', {
+    return render(request, 'payment/paymentSuccess.html', {
         'tenant': tenant,
         'payment': last_payment
     })
@@ -186,13 +240,13 @@ def rentHistory(request):
     tenant = Tenant.objects.filter(phone=phone, is_active=True).first()
 
     if not tenant:
-        return render(request, "tenant/noActiveStay.html")
+        return render(request, "dashboard/noActiveStay.html")
 
     payments = RentPayment.objects.filter(
         tenant=tenant
     ).order_by('-id')
 
-    return render(request, 'tenant/rentHistory.html', {
+    return render(request, 'payment/rentHistory.html', {
         'tenant': tenant,
         'payments': payments
     })
@@ -220,18 +274,12 @@ def tenantFlatTransactions(request, flat_id):
     building = flat.building
     owner = building.owner
 
-    return render(request, "tenant/flatTransactions.html", {
+    return render(request, "payment/flatTransactions.html", {
         "flat": flat,
         "building": building,
         "owner": owner,
         "payments": payments
     })
-
-
-
-def logoutTenant(request):
-    request.session.flush()
-    return redirect('loginTenant')
 
 
 def tenantCheckDue(request):
@@ -258,7 +306,7 @@ def tenantCheckDue(request):
         return redirect('tenantDashboard')
 
     # Rent is due
-    return render(request, "tenant/rentDuePrompt.html", {
+    return render(request, "payment/rentDuePrompt.html", {
         "tenant": tenant,
         "current_month": current_month
     })
