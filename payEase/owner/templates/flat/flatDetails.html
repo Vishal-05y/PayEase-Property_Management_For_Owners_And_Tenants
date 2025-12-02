@@ -29,22 +29,42 @@
 
     <!-- Right: Action Buttons -->
     <div class="space-x-2">
-        <a href="{% url 'removeTenant' flat.building.id flat.id %}">
-            <button class="px-5 py-2.5 bg-red-400 text-white rounded-lg shadow hover:bg-red-600 transition font-semibold">
-                Remove Tenant
-            </button>
-        </a>
-        <a href="{% url 'addTenant' flat.building.id flat.id %}">
-            <button class="px-5 py-2.5 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-900 transition font-semibold">
-                Add Tenant
+    
+    <!-- Flat Gallery -->
+    <a href="{% url 'flatGallery' flat.building.id flat.id %}">
+        <button class="px-5 py-2.5 bg-rose-400 text-white rounded-lg shadow hover:bg-rose-500 transition font-semibold">
+            Gallery
+        </button>
+    </a>
+
+    <!-- Edit Flat -->
+    <a href="{% url 'editFlat' flat.building.id flat.id %}">
+        <button class="px-5 py-2.5 bg-amber-300 text-white rounded-lg shadow hover:bg-amber-400 transition font-semibold">
+            Edit
+        </button>
+    </a>
+
+    <!-- Remove Tenant -->
+    <a href="{% url 'removeTenant' flat.building.id flat.id %}">
+        <button class="px-5 py-2.5 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition font-semibold">
+            Remove Tenant
+        </button>
+    </a>
+
+    <!-- Add Tenant -->
+    <a href="{% url 'addTenant' flat.building.id flat.id %}">
+        <button class="px-5 py-2.5 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-900 transition font-semibold">
+            Add Tenant
+        </button>
+    </a>
+
+    <!-- Past Tenants -->
+    <a href="{% url 'pastTenants' flat.building.id flat.id %}">
+        <button class="px-5 py-2.5 bg-gray-700 text-white rounded-lg shadow hover:bg-gray-900 transition font-semibold">
+            Past Tenants
             </button>
         </a>
 
-        <a href="{% url 'pastTenants' flat.building.id flat.id %}">
-            <button class="px-5 py-2.5 bg-gray-700 text-white rounded-lg shadow hover:bg-gray-900 transition font-semibold">
-                View Past Tenants
-            </button>
-        </a>
     </div>
 </div>
 

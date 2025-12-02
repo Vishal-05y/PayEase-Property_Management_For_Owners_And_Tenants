@@ -1,0 +1,123 @@
+{% extends "base/owner_layout.html" %}
+
+{% block title %}Building Gallery{% endblock %}
+
+{% block navbar %}
+<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
+<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
+<a href="{% url 'logoutOwner' %}">
+    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
+</a>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'buildingDetails' building.id %}">Back</a>
+
+<h1 class="text-4xl font-extrabold text-cyan-900 mb-6">{{ building.name }} — Gallery</h1>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+    <!-- IMAGE GALLERY -->
+    <div class="bg-white p-8 rounded-2xl shadow border border-gray-200">
+        <h2 class="text-2xl font-semibold text-cyan-800 mb-6">Images</h2>
+
+        {% if building.images.all %}
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+
+                {% for img in building.images.all %}
+                    <div class="relative group rounded-xl border overflow-hidden shadow-sm">
+
+                        <img src="{{ img.image.url }}"
+                             class="w-full h-48 object-cover rounded-xl cursor-pointer"
+                             onclick="openSlider({{ forloop.counter0 }})">
+
+                        <a href="{% url 'deleteBuildingImage' img.id %}"
+                           class="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 text-sm rounded-lg 
+                                  opacity-0 group-hover:opacity-100 transition">
+                            Delete
+                        </a>
+                    </div>
+                {% endfor %}
+
+            </div>
+        {% else %}
+            <p class="text-gray-600">No images uploaded yet.</p>
+        {% endif %}
+    </div>
+
+    <!-- UPLOAD SECTION -->
+    <div class="bg-white p-8 rounded-2xl shadow border border-gray-200">
+        <h2 class="text-2xl font-semibold text-cyan-800 mb-4">Upload Images</h2>
+
+        {% if request.session.upload_error %}
+            <div class="bg-red-100 text-red-800 border border-red-300 p-3 rounded-lg mb-4">
+                {{ request.session.upload_error }}
+            </div>
+
+            <script>
+                fetch("/owner/clear-upload-error/");
+            </script>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <input type="file" name="images" multiple accept="image/*"
+                   class="w-full p-3 border rounded-lg"
+                   onchange="checkLimit(this, {{ building.images.count }})">
+
+            <button class="mt-4 px-6 py-3 bg-cyan-700 text-white rounded-xl shadow hover:bg-cyan-900 transition font-semibold">
+                Upload
+            </button>
+        </form>
+    </div>
+
+</div>
+
+<!-- SLIDER MODAL (same as before) -->
+<div id="sliderModal" class="fixed inset-0 bg-black bg-opacity-80 hidden z-50 flex items-center justify-center">
+
+    <img id="sliderImage" src="" class="max-h-[90%] max-w-[90%] rounded-lg shadow-lg">
+
+    <button onclick="closeSlider()" class="absolute top-5 right-5 text-white text-3xl font-bold">✕</button>
+    <button onclick="prevSlide()" class="absolute left-5 text-white text-4xl font-bold">❮</button>
+    <button onclick="nextSlide()" class="absolute right-5 text-white text-4xl font-bold">❯</button>
+</div>
+
+<script>
+function checkLimit(input, currentCount) {
+    if (currentCount + input.files.length > 5) {
+        alert("Max 5 images allowed!");
+        input.value = "";
+    }
+}
+
+let sliderIndex = 0;
+let sliderImages = [
+    {% for img in building.images.all %}
+        "{{ img.image.url }}",
+    {% endfor %}
+];
+
+function openSlider(i) {
+    sliderIndex = i;
+    document.getElementById("sliderModal").classList.remove("hidden");
+    updateSlider();
+}
+function closeSlider() {
+    document.getElementById("sliderModal").classList.add("hidden");
+}
+function updateSlider() {
+    document.getElementById("sliderImage").src = sliderImages[sliderIndex];
+}
+function nextSlide() {
+    sliderIndex = (sliderIndex + 1) % sliderImages.length;
+    updateSlider();
+}
+function prevSlide() {
+    sliderIndex = (sliderIndex - 1 + sliderImages.length) % sliderImages.length;
+    updateSlider();
+}
+</script>
+
+{% endblock %}

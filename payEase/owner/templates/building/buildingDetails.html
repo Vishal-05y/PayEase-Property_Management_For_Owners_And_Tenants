@@ -27,9 +27,19 @@
     </div>
 
     <div>
+        <a href="{% url 'buildingGallery' building.id %}">
+            <button class="px-6 py-3 bg-rose-400 text-white rounded-xl shadow hover:bg-rose-500 transition font-semibold">
+                Gallery
+            </button>
+        </a>
+        <a href="{% url 'editBuilding' building.id %}">
+            <button class="px-6 py-3 bg-amber-300 text-white rounded-xl shadow hover:bg-amber-400 transition font-semibold">
+                Edit
+            </button>
+        </a>
         <a href="{% url 'addFlat' building.id %}">
             <button class="px-6 py-3 bg-cyan-700 text-white rounded-xl shadow hover:bg-cyan-900 transition font-semibold">
-                + Add Flat
+                Add Flat
             </button>
         </a>
     </div>

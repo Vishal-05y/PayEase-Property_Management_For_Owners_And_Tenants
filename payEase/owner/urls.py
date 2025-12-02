@@ -12,11 +12,27 @@ urlpatterns = [
 
     path('building/add/', views.addBuilding, name='addBuilding'),
 
+    path('buildings/<int:building_id>/edit/', views.editBuilding, name='editBuilding'),
+
+    path('buildings/<int:building_id>/add-image/', views.addBuildingImage, name='addBuildingImage'),
+
+    path("clear-upload-error/", views.clearUploadError, name="clearUploadError"),
+
+    path('buildings/image/<int:image_id>/delete/', views.deleteBuildingImage, name='deleteBuildingImage'),
+
+    path("building/<int:building_id>/gallery/", views.buildingGallery, name="buildingGallery"),
+
     path('buildings/<int:building_id>/', views.buildingDetails, name='buildingDetails'),
 
     path('buildings/<int:building_id>/addFlat/', views.addFlat, name='addFlat'),
 
     path("buildings/<int:building_id>/flat/<int:flat_id>/delete/", views.deleteFlat, name="deleteFlat"),
+
+    path('buildings/<int:building_id>/flat/<int:flat_id>/gallery/', views.flatGallery, name='flatGallery'),
+
+    path('buildings/<int:building_id>/flat/<int:flat_id>/edit/', views.editFlat, name='editFlat'),
+
+    path('flat/image/<int:image_id>/delete/', views.deleteFlatImage, name='deleteFlatImage'),
 
     path('buildings/<int:building_id>/flat/<int:flat_id>/', views.flatDetails, name='flatDetails'),
 

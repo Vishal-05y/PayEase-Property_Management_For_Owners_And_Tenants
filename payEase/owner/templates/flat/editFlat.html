@@ -1,0 +1,26 @@
+{% extends "base/owner_layout.html" %}
+
+{% block title %}Edit Flat{% endblock %}
+
+{% block content %}
+<a href="{% url 'flatDetails' flat.building.id flat.id %}">Back</a>
+
+<h1 class="text-3xl font-bold text-cyan-900 mb-6">Edit Flat {{ flat.flat_number }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <label class="block font-semibold text-gray-700">Flat Number</label>
+    <input type="text" name="flat_number" value="{{ flat.flat_number }}"
+           class="w-full p-3 border rounded-lg mb-4">
+
+    <label class="block font-semibold text-gray-700">Flat Type</label>
+    <input type="text" name="flat_type" value="{{ flat.flat_type }}"
+           class="w-full p-3 border rounded-lg mb-4">
+
+    <button class="mt-4 px-6 py-3 bg-cyan-700 text-white rounded-lg hover:bg-cyan-900 transition">
+        Save Changes
+    </button>
+</form>
+
+{% endblock %}

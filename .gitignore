@@ -24,3 +24,6 @@ payEase/owner/migrations/
 
 # Ignore tenant migrations
 payEase/tenant/migrations/
+
+# Ignore images
+payEase/media 

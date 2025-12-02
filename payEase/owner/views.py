@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.utils import timezone
-from .models import Owner, Building, Flat
+from .models import Owner, Building, Flat, BuildingImage, FlatImage
 from .forms import SignUpOwnerForm, LoginOwnerForm, BuildingForm, FlatForm, addTenantForm
+from . import forms
 from datetime import datetime
 from django.http import JsonResponse
 
@@ -170,6 +171,114 @@ def addBuilding(request):
     })
 
 
+def editBuilding(request, building_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    # Ensure building belongs to this owner
+    building = get_object_or_404(Building, id=building_id, owner__phone=phone)
+
+    if request.method == "POST":
+        form = BuildingForm(request.POST, instance=building)
+
+        if form.is_valid():
+            form.save()
+            return redirect('buildingDetails', building_id=building.id)
+
+    else:
+        form = BuildingForm(instance=building)
+
+    return render(request, "building/editBuilding.html", {
+        "form": form,
+        "building": building
+    })
+
+
+def addBuildingImage(request, building_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    building = get_object_or_404(Building, id=building_id, owner__phone=phone)
+
+    # Maximum allowed images
+    max_images = 5
+    current_count = building.images.count()
+
+    if request.method == "POST":
+        new_images = request.FILES.getlist('images')
+
+        # If adding these images exceeds limit → DO NOT load new page
+        if current_count + len(new_images) > max_images:
+            # Store error message in session
+            request.session["upload_error"] = (
+                f"You can upload only 5 images."
+            )
+
+            return redirect('editBuilding', building_id=building.id)
+
+        # Otherwise upload the images
+        for img in new_images:
+            BuildingImage.objects.create(building=building, image=img)
+
+        return redirect('editBuilding', building_id=building.id)
+
+
+def clearUploadError(request):
+    if "upload_error" in request.session:
+        del request.session["upload_error"]
+    return HttpResponse("")  # return empty response
+
+
+# -------------------- DELETE BUILDING IMAGES --------------------
+
+def deleteBuildingImage(request, image_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    img = get_object_or_404(BuildingImage, id=image_id, building__owner__phone=phone)
+    building_id = img.building.id
+    
+    img.image.delete()  # Deletes file from media folder
+    img.delete()
+
+    return redirect('editBuilding', building_id=building_id)
+
+
+def buildingGallery(request, building_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    building = get_object_or_404(Building, id=building_id, owner__phone=phone)
+
+    # Max images allowed
+    max_images = 5
+
+    if request.method == "POST":
+        new_images = request.FILES.getlist('images')
+
+        # Prevent exceeding limit
+        if building.images.count() + len(new_images) > max_images:
+            remaining = max_images - building.images.count()
+            request.session["upload_error"] = f"You can upload only {remaining} more image(s). Maximum allowed is 5."
+            return redirect("buildingGallery", building_id=building_id)
+
+        # Upload images
+        for img in new_images:
+            BuildingImage.objects.create(building=building, image=img)
+
+        return redirect("buildingGallery", building_id=building_id)
+
+    return render(request, "building/gallery.html", {
+        "building": building,
+        "max_images": max_images
+    })
+
+
+
 # -------------------- BUILDING DETAILS --------------------
 
 def buildingDetails(request, building_id):
@@ -206,6 +315,7 @@ def buildingDetails(request, building_id):
         'unpaid_tenants': unpaid_tenants,
         'current_month': current_month,
     })
+
 
 
 # -------------------- ADD FLAT --------------------
@@ -291,6 +401,82 @@ def flatDetails(request, building_id, flat_id):
         'flat': flat,
         'tenant': tenant,
     })
+
+
+def editFlat(request, building_id, flat_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    flat = get_object_or_404(
+        Flat,
+        id=flat_id,
+        building_id=building_id,
+        building__owner__phone=phone
+    )
+
+    if request.method == "POST":
+        form = FlatForm(request.POST, instance=flat)
+        if form.is_valid():
+            form.save()
+            return redirect('flatDetails', building_id=building_id, flat_id=flat_id)
+
+    else:
+        form = FlatForm(instance=flat)
+
+    return render(request, "flat/editFlat.html", {
+        "flat": flat,
+        "form": form,
+    })
+
+
+def flatGallery(request, building_id, flat_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    flat = get_object_or_404(
+        Flat,
+        id=flat_id,
+        building_id=building_id,
+        building__owner__phone=phone
+    )
+
+    max_images = 5
+
+    if request.method == "POST":
+        images = request.FILES.getlist("images")
+
+        # Prevent exceeding limit
+        if flat.images.count() + len(images) > max_images:
+            remaining = max_images - flat.images.count()
+            request.session["upload_error"] = f"You can upload only {remaining} more image(s). Maximum allowed is 5."
+            return redirect("flatGallery", building_id=building_id, flat_id=flat_id)
+
+        for img in images:
+            FlatImage.objects.create(flat=flat, image=img)
+
+        return redirect("flatGallery", building_id=building_id, flat_id=flat_id)
+
+    return render(request, "flat/flatGallery.html", {
+        "flat": flat,
+    })
+
+
+def deleteFlatImage(request, image_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    img = get_object_or_404(FlatImage, id=image_id, flat__building__owner__phone=phone)
+    flat = img.flat
+    building_id = flat.building.id
+
+    img.image.delete()
+    img.delete()
+
+    return redirect("flatGallery", building_id=building_id, flat_id=flat.id)
+
 
 
 # -------------------- ADD TENANT --------------------

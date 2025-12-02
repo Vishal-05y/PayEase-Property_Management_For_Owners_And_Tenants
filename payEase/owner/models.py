@@ -16,6 +16,16 @@ class Building(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.owner}"
+    
+
+class BuildingImage(models.Model):
+    building = models.ForeignKey(Building, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='building_images/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image for {self.building.name}"
+
 
 
 class Flat(models.Model):
@@ -25,3 +35,13 @@ class Flat(models.Model):
 
     def __str__(self):
         return f"{self.flat_number} ({self.flat_type}) - {self.building.name}"
+    
+
+class FlatImage(models.Model):
+    flat = models.ForeignKey(Flat, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='flat_images/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Image for Flat {self.flat.flat_number}"
+
