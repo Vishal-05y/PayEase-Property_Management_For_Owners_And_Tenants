@@ -15,7 +15,10 @@
                 PayEase
             </h1>
             <div class="flex items-center space-x-6">
-                {% block navbar %}{% endblock %}
+                {% block navbar %}
+                <a href="{% url 'ownerHome' %}" class="text-white hover:text-cyan-300">Owner</a>
+                <a href="{% url 'tenantHome' %}" class="text-white hover:text-cyan-300">Tenant</a>
+                {% endblock %}
             </div>
         </div>
     </nav>

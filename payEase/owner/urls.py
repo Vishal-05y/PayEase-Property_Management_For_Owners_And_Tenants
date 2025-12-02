@@ -16,6 +16,8 @@ urlpatterns = [
 
     path('buildings/<int:building_id>/addFlat/', views.addFlat, name='addFlat'),
 
+    path("buildings/<int:building_id>/flat/<int:flat_id>/delete/", views.deleteFlat, name="deleteFlat"),
+
     path('buildings/<int:building_id>/flat/<int:flat_id>/', views.flatDetails, name='flatDetails'),
 
     path('buildings/<int:building_id>/flat/<int:flat_id>/addTenant/', views.addTenant, name='addTenant'),

@@ -4,6 +4,7 @@ from django.utils import timezone
 from .models import Owner, Building, Flat
 from .forms import SignUpOwnerForm, LoginOwnerForm, BuildingForm, FlatForm, addTenantForm
 from datetime import datetime
+from django.http import JsonResponse
 
 from tenant.models import Tenant, RentPayment
 
@@ -241,6 +242,31 @@ def addFlat(request, building_id):
     return render(request, 'flat/addFlat.html', {
         'form': form,
         'building': building
+    })
+
+
+# -------------------- DELETE FLAT --------------------
+
+def deleteFlat(request, building_id, flat_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return JsonResponse({"success": False, "message": "You are not logged in."})
+
+    building = get_object_or_404(Building, id=building_id, owner__phone=phone)
+    flat = get_object_or_404(Flat, id=flat_id, building=building)
+
+    # Check if active tenant stays
+    if flat.tenants.filter(is_active=True).exists():
+        return JsonResponse({
+            "success": False,
+            "message": "This flat cannot be deleted because a tenant is currently occupying it. Please remove the tenant before attempting to delete the flat."
+        })
+
+    flat.delete()
+
+    return JsonResponse({
+        "success": True,
+        "message": "Flat deleted successfully."
     })
 
 

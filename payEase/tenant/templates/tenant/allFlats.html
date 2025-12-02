@@ -16,6 +16,14 @@
     <h1 class="text-3xl font-bold text-cyan-900 mb-6">
         Past Flats Details
     </h1>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="text-xl p-3 mb-3 rounded">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
     {% for flat in tenant %}
         <div class="p-6 bg-white border border-cyan-300 rounded-lg shadow">
 

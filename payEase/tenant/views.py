@@ -3,6 +3,8 @@ from .forms import loginTenantForm
 from .models import Tenant, RentPayment, Flat
 from django.http import HttpResponse
 from datetime import datetime
+from django.contrib import messages
+
 
 # Create your views here.
 def tenantHome(request):
@@ -61,11 +63,22 @@ def allFlats(request):
     if not phone:
         return redirect('loginTenant')
 
-    tenants = Tenant.objects.filter(phone=phone).select_related('flat', 'flat__building').order_by('-date_added')
+    tenants = Tenant.objects.filter(
+        is_active=False,
+        phone=phone
+    ).select_related('flat', 'flat__building').order_by('-date_added')
+
+    # If tenant has no flats
+    if not tenants.exists():
+        messages.info(request, "You do not have any previous flats.")
+        return render(request, 'tenant/allFlats.html', {
+            'tenant': [],
+        })
 
     return render(request, 'tenant/allFlats.html', {
         'tenant': tenants,
     })
+
 
 
 def flatDetails(request, flat_id):
