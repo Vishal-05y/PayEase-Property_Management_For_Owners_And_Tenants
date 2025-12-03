@@ -27,7 +27,7 @@ def loginTenant(request):
                 request.session['tenant_phone'] = phone
                 return redirect('tenantCheckDue')
 
-            return render(request, '/authentication/loginTenant.html', {
+            return render(request, 'authentication/loginTenant.html', {
                 'form': form,
                 'error': "You are not registered yet. Please contact your owner."
             })
@@ -90,7 +90,7 @@ def tenantBuildingGallery(request):
 
 # -------------------- FLAT --------------------
 
-def flatDetails(request, flat_id):
+def tenantFlatDetails(request, flat_id):
     phone = request.session.get('tenant_phone')
     if not phone:
         return redirect('loginTenant')
@@ -107,7 +107,7 @@ def flatDetails(request, flat_id):
     # Latest stay record for this flat
     stay = stays.first()
 
-    return render(request, 'flat/flatDetails.html', {
+    return render(request, 'flat/tenantFlatDetails.html', {
         'stay': stay,          # tenant-flat relationship
         'flat': stay.flat,     # flat details
         'building': stay.flat.building,
@@ -292,7 +292,7 @@ def tenantCheckDue(request):
 
     if not tenant:
         # No active flat
-        return render(request, "tenant/noActiveStay.html")
+        return render(request, "dashboard/noActiveStay.html")
 
     current_month = datetime.now().strftime("%B %Y")
 

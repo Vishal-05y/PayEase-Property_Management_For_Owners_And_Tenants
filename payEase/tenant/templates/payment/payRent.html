@@ -3,10 +3,10 @@
 {% block title %}Pay Rent{% endblock %}
 
 {% block navbar %}
-<a href="{% url 'tenantDashboard' %}" class="text-white hover:text-cyan-300 transition">Dashboard</a>
+<a href="{% url 'tenantDashboard' %}" class="hover-accent transition">Dashboard</a>
 
 <a href="{% url 'logoutTenant' %}">
-    <button class="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800 transition">
+    <button class="px-2 py-1 rounded transition btn-red">
         Logout
     </button>
 </a>
@@ -17,50 +17,82 @@
 <div class="max-w-3xl mx-auto p-6">
 
     <!-- Title -->
-    <h1 class="text-4xl font-extrabold text-cyan-900 mb-10 text-center">
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-primary mb-8 text-center">
         Pay Rent
     </h1>
 
-    <!-- Building -->
-    <section class="mb-10">
-        <h2 class="text-2xl font-bold text-cyan-800 mb-3">Building Details</h2>
-        <p class="text-lg"><span class="font-semibold text-gray-700">Name:</span> {{ tenant.flat.building.name }}</p>
-        <p class="text-lg"><span class="font-semibold text-gray-700">Address:</span> {{ tenant.flat.building.address }}</p>
-    </section>
-
-    <!-- Owner -->
-    <section class="mb-10">
-        <h2 class="text-2xl font-bold text-cyan-800 mb-3">Owner Details</h2>
-        <p class="text-lg"><span class="font-semibold text-gray-700">Name:</span> {{ tenant.flat.building.owner.name }}</p>
-        <p class="text-lg"><span class="font-semibold text-gray-700">Phone:</span> {{ tenant.flat.building.owner.phone }}</p>
-    </section>
-
-    <!-- Tenant -->
-    <section class="mb-10">
-        <h2 class="text-2xl font-bold text-cyan-800 mb-3">Your Details</h2>
-        <p class="text-lg"><span class="font-semibold text-gray-700">Name:</span> {{ tenant.name }}</p>
-        <p class="text-lg"><span class="font-semibold text-gray-700">Flat:</span> {{ tenant.flat.flat_number }}</p>
-        <p class="text-lg"><span class="font-semibold text-gray-700">Month:</span> {{ current_month }}</p>
-
-        <p class="text-4xl font-extrabold mt-4 text-green-700">
-            ₹{{ tenant.flat_price }}
+    <!-- BUILDING CARD -->
+    <section class="mb-4 bg-card border-dark rounded-2xl p-6 shadow">
+        <h2 class="text-lg font-semibold text-primary mb-2">Building Details</h2>
+        <p class="text-primary">
+            <span class="text-muted font-semibold">Name:</span> {{ tenant.flat.building.name }}
+        </p>
+        <p class="text-primary mt-1">
+            <span class="text-muted font-semibold">Address:</span> {{ tenant.flat.building.address }}
         </p>
     </section>
 
-    <!-- Payment Action -->
-    {% if already_paid %}
-        <p class="mt-6 text-xl text-green-600 font-semibold text-center">
-            Rent already paid for this month.
+    <!-- OWNER CARD -->
+    <section class="mb-4 bg-card border-dark rounded-2xl p-6 shadow">
+        <h2 class="text-lg font-semibold text-primary mb-2">Owner Details</h2>
+        <p class="text-primary">
+            <span class="text-muted font-semibold">Name:</span> {{ tenant.flat.building.owner.name }}
         </p>
-    {% else %}
-        <form action="{% url 'processPayment' %}" method="POST">
-            {% csrf_token %}
-            <button class="mt-6 w-full bg-green-700 text-white py-3 rounded-xl shadow 
-                           hover:bg-green-800 transition font-semibold">
-                Proceed to Payment
-            </button>
-        </form>
-    {% endif %}
+        <p class="text-primary mt-1">
+            <span class="text-muted font-semibold">Phone:</span> {{ tenant.flat.building.owner.phone }}
+        </p>
+    </section>
+
+    <!-- TENANT CARD -->
+    <section class="mb-4 bg-card border-dark rounded-2xl p-6 shadow">
+        <h2 class="text-lg font-semibold text-primary mb-2">Your Details</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+            <div>
+                <p class="text-muted text-sm">Name</p>
+                <p class="text-primary font-medium">{{ tenant.name }}</p>
+            </div>
+
+            <div>
+                <p class="text-muted text-sm">Flat</p>
+                <p class="text-primary font-medium">{{ tenant.flat.flat_number }} ({{ tenant.flat.flat_type }})</p>
+            </div>
+
+            <div>
+                <p class="text-muted text-sm">Month</p>
+                <p class="text-primary font-medium">{{ current_month }}</p>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <p class="text-muted text-sm">Amount Due</p>
+            <p class="text-3xl font-extrabold mt-1" style="color: #22c55e;">
+                ₹{{ tenant.flat_price }}
+            </p>
+        </div>
+    </section>
+
+    <!-- PAYMENT ACTION -->
+    <div class="mt-4">
+        {% if already_paid %}
+            <p class="text-center text-lg font-semibold" style="color:#16a34a;">
+                Rent already paid for {{ current_month }}.
+            </p>
+        {% else %}
+            <form action="{% url 'processPayment' %}" method="POST" class="mt-4">
+                {% csrf_token %}
+                <div class="max-w-md mx-auto">
+                    <button type="submit"
+                        class="w-full py-3 rounded-xl font-semibold shadow transition"
+                        style="background:#16a34a; color:var(--text-primary);"
+                        onmouseover="this.style.background='#15803d'"
+                        onmouseout="this.style.background='#16a34a'">
+                        Proceed to Payment
+                    </button>
+                </div>
+            </form>
+        {% endif %}
+    </div>
 
 </div>
 

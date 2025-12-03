@@ -202,20 +202,66 @@ def addBuilding(request):
     })
 
 
+def deleteBuilding(request, building_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return JsonResponse({"success": False, "message": "You are not logged in."})
+
+    building = get_object_or_404(
+        Building,
+        id=building_id,
+        owner__phone=phone
+    )
+
+    # Cannot delete if building has flats
+    if building.flats.exists():
+        return JsonResponse({
+            "success": False,
+            "message": "This building cannot be deleted because it contains flats. Please delete all flats before removing the building."
+        })
+
+    building.delete()
+
+    return JsonResponse({
+        "success": True,
+        "message": "Building deleted successfully."
+    })
+
+
+
+
+
+
 def editBuilding(request, building_id):
     phone = request.session.get('owner_phone')
     if not phone:
         return redirect('loginOwner')
 
-    # Ensure building belongs to this owner
     building = get_object_or_404(Building, id=building_id, owner__phone=phone)
 
     if request.method == "POST":
         form = BuildingForm(request.POST, instance=building)
 
         if form.is_valid():
+            new_address = form.cleaned_data['address']
+
+            # Check if this address already exists for another building of the same owner
+            duplicate = Building.objects.filter(
+                owner__phone=phone,
+                address__iexact=new_address
+            ).exclude(id=building_id).exists()
+
+            if duplicate:
+                # Address already exists → do not save
+                return render(request, "building/editBuilding.html", {
+                    "form": form,
+                    "building": building,
+                    "error": "This address already exists for another building. Cannot update."
+                })
+
+            # Safe to save
             form.save()
-            return redirect('buildingDetails', building_id=building.id)
+            return redirect('buildingDetails', building_id=building_id)
 
     else:
         form = BuildingForm(instance=building)

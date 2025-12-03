@@ -18,7 +18,7 @@ urlpatterns = [
 
 
     # Flat
-    path('flat/<int:flat_id>/', views.flatDetails, name='flatDetails'),
+    path('flat/<int:flat_id>/', views.tenantFlatDetails, name='flatDetails'),
 
     path('allFlats/', views.allFlats, name='allFlats'),
 

@@ -3,50 +3,52 @@
 {% block title %}Building Gallery{% endblock %}
 
 {% block navbar %}
-<a href="{% url 'tenantDashboard' %}"  class="text-white">Dashboard</a>
+<a href="{% url 'tenantDashboard' %}" class="hover-accent transition">Dashboard</a>
 <a href="{% url 'logoutTenant' %}">
-    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
+    <button class="px-2 py-1 btn-red rounded transition">Logout</button>
 </a>
 {% endblock %}
 
 {% block content %}
-<a href="{% url 'tenantDashboard' %}"  class="text-black">Back</a>
-
-<h1 class="text-4xl font-bold text-cyan-900 mb-8 text-center">
+<!-- Title -->
+<h1 class="text-4xl font-extrabold text-primary mt-4 mb-8 text-center">
     {{ building.name }} — Gallery
 </h1>
 
-<div class="bg-white p-10 rounded-2xl shadow-md mx-auto max-w-4xl">
+<!-- Gallery Container -->
 
     {% if images %}
-    <!-- LARGE SLIDER -->
+    <!-- LARGE IMAGE SLIDER -->
     <div class="relative w-full h-96 rounded-xl overflow-hidden shadow-lg">
 
         <img id="sliderLargeImage"
              src="{{ images.0.image.url }}"
              class="w-full h-full object-contain bg-black rounded-xl">
 
-        <!-- Prev -->
+        <!-- PREVIOUS BUTTON -->
         <button onclick="prevSlide()"
-                class="absolute left-3 top-1/2 -translate-y-1/2 
-                       bg-black bg-opacity-40 text-white px-4 py-2 text-3xl rounded-full hover:bg-opacity-70">
+            class="absolute left-3 top-1/2 -translate-y-1/2 
+                   bg-black bg-opacity-40 text-white px-4 py-2 text-3xl rounded-full
+                   hover:bg-opacity-70 transition">
             ❮
         </button>
 
-        <!-- Next -->
+        <!-- NEXT BUTTON -->
         <button onclick="nextSlide()"
-                class="absolute right-3 top-1/2 -translate-y-1/2 
-                       bg-black bg-opacity-40 text-white px-4 py-2 text-3xl rounded-full hover:bg-opacity-70">
+            class="absolute right-3 top-1/2 -translate-y-1/2 
+                   bg-black bg-opacity-40 text-white px-4 py-2 text-3xl rounded-full
+                   hover:bg-opacity-70 transition">
             ❯
         </button>
 
     </div>
+
     {% else %}
-        <p class="text-gray-600 text-center text-lg">No images available.</p>
+        <p class="text-muted text-center text-lg">No images available.</p>
     {% endif %}
 
-</div>
 
+<!-- JS for Slider -->
 <script>
 let sliderImages = [
     {% for img in images %}
@@ -56,12 +58,10 @@ let sliderImages = [
 
 let sliderIndex = 0;
 
-/* Update displayed image */
 function updateLarge() {
     document.getElementById("sliderLargeImage").src = sliderImages[sliderIndex];
 }
 
-/* Next / Prev controls */
 function nextSlide() {
     sliderIndex = (sliderIndex + 1) % sliderImages.length;
     updateLarge();

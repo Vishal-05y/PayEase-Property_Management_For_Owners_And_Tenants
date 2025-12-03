@@ -5,33 +5,29 @@
 {% block content %}
 
 <!-- Center Container -->
-<div class="flex justify-center">
-    <div class="w-full max-w-lg bg-white rounded-2xl p-10">
+<div class="flex justify-center w-full mt-10">
+
+    <div class="w-full max-w-lg bg-card border-dark rounded-2xl p-10 text-center">
 
         <!-- Title -->
-        <h1 class="text-3xl font-extrabold text-cyan-900 mb-4 text-center">
+        <h1 class="text-3xl font-extrabold text-primary mb-4">
             Tenant Portal
         </h1>
 
         <!-- Subtitle -->
-        <p class="text-gray-600 text-center mb-8">
+        <p class="text-muted mb-8">
             Access your flat details and payment information.
         </p>
 
-        <!-- Buttons -->
-        <div class="flex flex-col space-y-5">
-
-            <!-- Login Button -->
-            <a href="loginTenant">
-                <button class="w-full py-3 bg-cyan-700 text-white rounded-xl 
-                               font-semibold shadow hover:bg-cyan-800 transition">
-                    Login as Tenant
-                </button>
-            </a>
-
-        </div>
+        <!-- Login Button -->
+        <a href="{% url 'loginTenant' %}">
+            <button class="w-full py-3 rounded-xl font-semibold btn-blue transition">
+                Login as Tenant
+            </button>
+        </a>
 
     </div>
+
 </div>
 
 {% endblock %}

@@ -1,33 +1,50 @@
 {% load static tailwind_tags %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>{% block title %}{% endblock %}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Global Colors -->
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+
     {% tailwind_css %}
 </head>
 
-<body class="bg-cyan-800 min-h-screen flex flex-col">
+<body class="bg-dark min-h-screen flex flex-col text-primary">
 
-    <!-- TENANT NAVBAR -->
-    <nav class="bg-cyan-900">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <a href="{% url 'base/home' %}">
-                <h1 class="text-4xl font-extrabold text-[#5a82b5] tracking-wide">
-                    PayEase
-                </h1>
-            </a>
-            <div class="flex items-center space-x-6">
+    <!-- NAVBAR -->
+    <nav class="bg-card border-b border-dark sticky top-0 z-50">
+        <div class="w-full px-4 py-4 flex items-center justify-between mx-auto"
+             style="max-width: 950px;">
+
+            <h1 class="text-2xl font-bold text-accent tracking-wide">
+                PayEase
+            </h1>
+
+            <div class="flex items-center space-x-3 text-sm">
                 {% block navbar %}
-                <a href="{% url 'ownerHome' %}" class="text-white hover:text-cyan-300">Owner</a>
-                <a href="{% url 'tenantHome' %}" class="text-white hover:text-cyan-300">Tenant</a>
+                <a href="{% url 'ownerHome' %}" class="transition hover-accent">Owner</a>
+                <a href="{% url 'tenantHome' %}" class="transition hover-accent">Tenant</a>
                 {% endblock %}
             </div>
+
         </div>
     </nav>
 
+    <!-- PAGE BODY -->
     <main class="flex-grow">
-        <div class="max-w-4xl mx-auto bg-white rounded-lg p-8 mt-10 mb-10">
-            {% block content %}{% endblock %}
+        <div class="flex-col mx-auto w-full" style="max-width: 950px;">
+
+            <div class="px-4 py-2">
+                {% block back %}{% endblock %}
+            </div>
+
+            <div class="px-4 py-3">
+                {% block content %}{% endblock %}
+            </div>
+
         </div>
     </main>
 

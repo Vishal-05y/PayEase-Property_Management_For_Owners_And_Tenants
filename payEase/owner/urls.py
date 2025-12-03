@@ -21,6 +21,8 @@ urlpatterns = [
 
     path('building/add/', views.addBuilding, name='addBuilding'),
 
+    path("building/<int:building_id>/delete/", views.deleteBuilding, name="deleteBuilding"),
+
     path('buildings/<int:building_id>/edit/', views.editBuilding, name='editBuilding'),
 
     path('buildings/<int:building_id>/add-image/', views.addBuildingImage, name='addBuildingImage'),
