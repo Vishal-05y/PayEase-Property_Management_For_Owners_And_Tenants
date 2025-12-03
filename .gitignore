@@ -27,3 +27,6 @@ payEase/tenant/migrations/
 
 # Ignore images
 payEase/media 
+
+#Ignore settings
+payEase/payEase/settings.py
