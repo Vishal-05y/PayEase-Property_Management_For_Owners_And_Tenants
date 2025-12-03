@@ -1,60 +1,79 @@
-{% extends "base/owner_layout.html" %}
+{% extends "building/buildingDetails.html" %}
 
 {% block title %}Add Flat{% endblock %}
 
 {% block navbar %}
-<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
-<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
+<a href="{% url 'ownerDashboard' %}" class="transition hover-accent">Dashboard</a>
+<a href="{% url 'addBuilding' %}" class="transition hover-accent">Add Building</a>
+
 <a href="{% url 'logoutOwner' %}">
-    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
+    <button class="px-2 py-1 rounded-lg transition btn-red">
+        Logout
+    </button>
 </a>
 {% endblock %}
 
+
+{% block back %}
+<a href="{% url 'buildingDetails' building.id %}" class="text-accent transition">Back</a>
+{% endblock %}
+
+
 {% block content %}
 
-<h1 class="text-3xl font-extrabold text-cyan-900 mb-6 text-center">
+<h1 class="text-3xl font-extrabold text-primary mb-6 text-center">
     Add New Flat
 </h1>
 
-<p class="text-gray-700 text-center mb-8">
-    Building: <strong class="text-cyan-800">{{ building.name }}</strong>
+<p class="text-muted text-center mb-8">
+    Building: <strong class="text-primary">{{ building.name }}</strong>
 </p>
 
-<!-- Center Card -->
-<div class="max-w-xl mx-auto bg-white rounded-2xl p-10">
+
+<!-- Centered Card -->
+<div class="max-w-xl mx-auto bg-card rounded-2xl border-dark p-10 shadow">
 
     <form method="POST" class="space-y-6">
         {% csrf_token %}
 
         <!-- Flat Number -->
         <div class="flex flex-col space-y-1">
-            <label class="font-semibold text-gray-700">Flat Number</label>
+            <label class="font-semibold text-muted">Flat Number</label>
+
             <input type="text" name="flat_number"
-                class="border border-gray-300 rounded-lg p-3 w-full
-                       focus:ring-2 focus:ring-cyan-600 focus:outline-none"
-                placeholder="Enter flat number" required>
+                   class="rounded-lg p-3 w-full bg-card text-primary border-dark transition"
+                   placeholder="Enter flat number" required
+                   onfocus="this.classList.add('border-light')"
+                   onblur="this.classList.remove('border-light')">
         </div>
+
 
         <!-- Flat Type -->
         <div class="flex flex-col space-y-1">
-            <label class="font-semibold text-gray-700">Flat Type</label>
+            <label class="font-semibold text-muted">Flat Type</label>
+
             <input type="text" name="flat_type"
-                class="border border-gray-300 rounded-lg p-3 w-full
-                       focus:ring-2 focus:ring-cyan-600 focus:outline-none"
-                placeholder="Enter flat type (Ex: 1BHK, 2BHK)" required>
+                   class="rounded-lg p-3 w-full bg-card text-primary border-dark transition"
+                   placeholder="Enter flat type (Ex: 1BHK, 2BHK)" required
+                   onfocus="this.classList.add('border-light')"
+                   onblur="this.classList.remove('border-light')">
         </div>
+
 
         <!-- Error -->
         {% if error %}
-        <div class="mb-4 p-4 bg-red-100 text-red-800 border border-red-300 rounded-lg">
+        <div class="mb-4 p-4 rounded-lg font-medium"
+             style="background: rgba(244,63,94,0.15);
+                    border: 1px solid var(--btn-red);
+                    color: var(--btn-red);">
             {{ error }}
         </div>
         {% endif %}
 
+
         <!-- Submit Button -->
         <button type="submit"
-            class="w-full bg-cyan-700 text-white py-3 rounded-xl font-semibold
-                   shadow hover:bg-cyan-800 transition">
+                class="w-full py-3 rounded-xl font-semibold shadow transition btn-blue">
             Save Flat
         </button>
 

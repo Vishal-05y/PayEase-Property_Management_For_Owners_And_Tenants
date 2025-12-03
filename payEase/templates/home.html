@@ -1,3 +1,6 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'colors.css' %}">
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,28 +10,33 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-cyan-800 h-screen flex items-center justify-center">
+<body class="bg-[#0d1117] h-screen flex items-center justify-center px-4">
 
-    <div class="bg-white w-full max-w-md p-10 rounded-2xl text-center space-y-8">
+    <!-- PANEL -->
+    <div class="bg-[#161b22] w-full max-w-md p-10 rounded-2xl border border-[#30363d] text-center space-y-8 shadow-xl">
 
-        <h1 class="text-4xl font-extrabold text-cyan-900">
+        <!-- TITLE -->
+        <h1 class="text-4xl font-extrabold text-[#5a82b5] tracking-wide">
             PayEase
         </h1>
 
-        <p class="text-gray-600 text-lg">
+        <p class="text-[#8b949e] text-lg">
             Choose your login
         </p>
 
+        <!-- BUTTONS -->
         <div class="space-y-4">
 
             <a href="owner" class="block">
-                <button class="w-full py-3 bg-cyan-700 text-white font-semibold rounded-xl shadow hover:bg-cyan-900 transition">
+                <button class="w-full py-3 bg-[#204066] text-white font-semibold rounded-xl
+                               hover:bg-[#264d75] transition shadow">
                     Owner
                 </button>
             </a>
 
             <a href="tenant" class="block">
-                <button class="w-full py-3 bg-gray-700 text-white font-semibold rounded-xl shadow hover:bg-gray-900 transition">
+                <button class="w-full py-3 bg-[#30363d] text-[#e6edf3] font-semibold rounded-xl
+                               hover:bg-[#3a4550] transition shadow">
                     Tenant
                 </button>
             </a>

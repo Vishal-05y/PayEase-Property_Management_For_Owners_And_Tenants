@@ -322,12 +322,12 @@ def flatDetails(request, building_id, flat_id):
         building__owner__phone=phone
     )
 
-    # Only ACTIVE tenant
     tenant = flat.tenants.filter(is_active=True).order_by('-date_added').first()
 
     return render(request, 'flat/flatDetails.html', {
         'flat': flat,
         'tenant': tenant,
+        'building': flat.building,
     })
 
 
@@ -362,7 +362,7 @@ def addFlat(request, building_id):
 
     return render(request, 'flat/addFlat.html', {
         'form': form,
-        'building': building
+        'building': building,
     })
 
 
@@ -390,6 +390,7 @@ def editFlat(request, building_id, flat_id):
     return render(request, "flat/editFlat.html", {
         "flat": flat,
         "form": form,
+        "building": flat.building,
     })
 
 
@@ -446,6 +447,7 @@ def flatGallery(request, building_id, flat_id):
 
     return render(request, "flat/flatGallery.html", {
         "flat": flat,
+        "building": flat.building,
     })
 
 
@@ -498,7 +500,8 @@ def addTenant(request, building_id, flat_id):
 
     return render(request, 'tenant/addTenant.html', {
         'form': form,
-        'flat': flat
+        'flat': flat,
+        'building': flat.building,
     })
 
 
@@ -553,7 +556,8 @@ def pastTenants(request, building_id, flat_id):
 
     return render(request, 'tenant/pastTenants.html', {
         'flat': flat,
-        'tenants': past
+        'tenants': past,
+        'building': flat.building,
     })
 
 

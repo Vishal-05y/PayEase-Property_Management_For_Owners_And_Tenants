@@ -1,41 +1,62 @@
-{% extends "base/owner_layout.html" %}
+{% extends "building/buildingDetails.html" %}
 
 {% block title %}Edit Building{% endblock %}
 
-{% block navbar %}
-<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
-<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
-<a href="{% url 'logoutOwner' %}">
-    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
-</a>
+
+{% block back %}
+<a href="{% url 'buildingDetails' building.id%}" class="text-accent transition">Back</a>
 {% endblock %}
 
+
 {% block content %}
-<a href="{% url 'buildingDetails' building.id %}">Back</a>
+<h1 class="text-3xl font-extrabold text-center mt-6 mb-8 text-primary">
+    Edit Building Details
+</h1>
 
-<h1 class="text-4xl font-extrabold text-cyan-900 mb-10 text-center">Edit Building Details</h1>
+<div class="bg-card p-10 rounded-2xl border-dark shadow">
 
-<div class="bg-white p-10 rounded-2xl shadow-md border border-gray-200">
-    <h2 class="text-2xl font-semibold text-cyan-800 mb-6">Building Details</h2>
+    <h2 class="text-2xl font-semibold text-primary mb-6">
+        Building Details
+    </h2>
 
-    <form method="post">
+    <form method="post" class="space-y-6">
         {% csrf_token %}
 
-        <label class="block text-gray-700 font-semibold mt-4">Building Name</label>
-        <input type="text" name="name" value="{{ building.name }}"
-                class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-cyan-700">
+        <!-- Building Name -->
+        <div>
+            <label class="block font-semibold text-muted mb-1">Building Name</label>
 
-        <label class="block text-gray-700 font-semibold mt-4">Address</label>
-        <textarea name="address" rows="3"
-                    class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-cyan-700">{{ building.address }}</textarea>
+            <input type="text" name="name" value="{{ building.name }}"
+                   class="w-full p-3 rounded-lg bg-card text-primary border-dark transition"
+                   onfocus="this.classList.add('border-light')"
+                   onblur="this.classList.remove('border-light')">
+        </div>
 
-        <label class="block text-gray-700 font-semibold mt-4">Approx. Cost</label>
-        <input type="number" name="cost" value="{{ building.cost }}"
-                class="w-full mt-1 p-3 border rounded-lg focus:ring-2 focus:ring-cyan-700">
+        <!-- Address -->
+        <div>
+            <label class="block font-semibold text-muted mb-1">Address</label>
 
-        <button class="mt-6 px-6 py-3 bg-cyan-700 text-white font-semibold rounded-xl shadow hover:bg-cyan-900 transition">
+            <textarea name="address" rows="3"
+                      class="w-full p-3 rounded-lg bg-card text-primary border-dark transition"
+                      onfocus="this.classList.add('border-light')"
+                      onblur="this.classList.remove('border-light')">{{ building.address }}</textarea>
+        </div>
+
+        <!-- Cost -->
+        <div>
+            <label class="block font-semibold text-muted mb-1">Approx. Cost</label>
+
+            <input type="number" name="cost" value="{{ building.cost }}"
+                   class="w-full p-3 rounded-lg bg-card text-primary border-dark transition"
+                   onfocus="this.classList.add('border-light')"
+                   onblur="this.classList.remove('border-light')">
+        </div>
+
+        <!-- Save Button -->
+        <button class="w-full px-6 py-3 rounded-xl shadow font-semibold transition btn-blue">
             Save Changes
         </button>
+
     </form>
 </div>
 

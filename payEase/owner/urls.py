@@ -27,7 +27,7 @@ urlpatterns = [
 
     path('buildings/image/<int:image_id>/delete/', views.deleteBuildingImage, name='deleteBuildingImage'),
     
-    path("building/<int:building_id>/gallery/", views.buildingGallery, name="buildingGallery"),
+    path("buildings/<int:building_id>/gallery/", views.buildingGallery, name="buildingGallery"),
 
     path("clear-upload-error/", views.clearUploadError, name="clearUploadError"),
 

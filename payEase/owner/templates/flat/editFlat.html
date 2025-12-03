@@ -1,26 +1,54 @@
-{% extends "base/owner_layout.html" %}
+{% extends "building/buildingDetails.html" %}
 
 {% block title %}Edit Flat{% endblock %}
 
+
+{% block back %}
+<a href="{% url 'flatDetails' flat.building.id flat.id %}" class="text-accent transition">Back</a>
+{% endblock %}
+
+
 {% block content %}
-<a href="{% url 'flatDetails' flat.building.id flat.id %}">Back</a>
+<h1 class="text-3xl font-bold text-primary mb-6 mt-4">
+    Edit Flat {{ flat.flat_number }}
+</h1>
 
-<h1 class="text-3xl font-bold text-cyan-900 mb-6">Edit Flat {{ flat.flat_number }}</h1>
 
-<form method="post">
-    {% csrf_token %}
+<!-- Form Container -->
+<div class="max-w-xl bg-card border-dark rounded-2xl p-8 shadow">
 
-    <label class="block font-semibold text-gray-700">Flat Number</label>
-    <input type="text" name="flat_number" value="{{ flat.flat_number }}"
-           class="w-full p-3 border rounded-lg mb-4">
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
 
-    <label class="block font-semibold text-gray-700">Flat Type</label>
-    <input type="text" name="flat_type" value="{{ flat.flat_type }}"
-           class="w-full p-3 border rounded-lg mb-4">
+        <!-- Flat Number -->
+        <div>
+            <label class="block font-semibold text-muted mb-1">Flat Number</label>
 
-    <button class="mt-4 px-6 py-3 bg-cyan-700 text-white rounded-lg hover:bg-cyan-900 transition">
-        Save Changes
-    </button>
-</form>
+            <input type="text" name="flat_number" value="{{ flat.flat_number }}"
+                   class="w-full p-3 rounded-lg bg-card text-primary border-dark transition"
+                   onfocus="this.classList.add('border-light')"
+                   onblur="this.classList.remove('border-light')">
+        </div>
+
+
+        <!-- Flat Type -->
+        <div>
+            <label class="block font-semibold text-muted mb-1">Flat Type</label>
+
+            <input type="text" name="flat_type" value="{{ flat.flat_type }}"
+                   class="w-full p-3 rounded-lg bg-card text-primary border-dark transition"
+                   onfocus="this.classList.add('border-light')"
+                   onblur="this.classList.remove('border-light')">
+        </div>
+
+
+        <!-- Submit Button -->
+        <button class="w-full py-3 rounded-xl font-semibold shadow transition btn-blue">
+            Save Changes
+        </button>
+
+    </form>
+
+</div>
 
 {% endblock %}

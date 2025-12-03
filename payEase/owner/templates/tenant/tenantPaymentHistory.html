@@ -3,31 +3,44 @@
 {% block title %}Payment History{% endblock %}
 
 {% block navbar %}
-<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
-<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
+<a href="{% url 'ownerDashboard' %}" class="hover:text-accent">Dashboard</a>
+<a href="{% url 'addBuilding' %}" class="hover:text-accent">Add Building</a>
+
 <a href="{% url 'logoutOwner' %}">
-    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
+    <button class="px-3 py-1 rounded-lg font-semibold btn-red">
+        Logout
+    </button>
 </a>
 {% endblock %}
 
+
+{% block back %}
+<a href="{% url 'flatDetails' flat.building.id flat.id %}" class="text-accent transition">Back</a>
+{% endblock %}
+
+
+
 {% block content %}
 
-<h1 class="text-3xl font-bold text-cyan-900 mb-6">
+<h1 class="text-3xl font-bold text-primary mb-6">
     Payment History — Flat {{ flat.flat_number }}
 </h1>
 
 {% if tenant %}
-    <p class="text-lg mb-4">
-        <strong>Tenant:</strong> {{ tenant.name }} ({{ tenant.phone }})
+    <p class="text-primary mb-4 text-lg">
+        <span class="text-muted font-semibold">Tenant:</span> {{ tenant.name }} ({{ tenant.phone }})
     </p>
 {% else %}
-    <p class="text-gray-600 mb-4">No tenant currently assigned.</p>
+    <p class="text-muted mb-4">No tenant currently assigned.</p>
 {% endif %}
 
-<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-xl border border-cyan-300 overflow-hidden">
 
-    <table class="w-full text-left border-collapse">
-        <thead class="bg-cyan-700 text-white">
+<!-- SCROLLABLE TABLE (identical to All Transactions) -->
+<div class="overflow-x-auto bg-card border-dark rounded-xl shadow">
+
+    <table class="w-full min-w-[700px] text-left text-primary">
+
+        <thead class="bg-[#1f2937]">
             <tr>
                 <th class="py-3 px-4 text-sm font-semibold">Month</th>
                 <th class="py-3 px-4 text-sm font-semibold">Amount</th>
@@ -40,33 +53,41 @@
         <tbody>
         {% if payments %}
             {% for p in payments %}
-                <tr class="border-b hover:bg-cyan-50">
-                    <td class="py-3 px-4 font-medium">{{ p.month }}</td>
-                    <td class="py-3 px-4">₹{{ p.amount }}</td>
-                    <td class="py-3 px-4 text-sm">{{ p.payment_id }}</td>
-                    <td class="py-3 px-4 text-sm">{{ p.date_paid|date:"F j, Y" }}</td>
-                    <td class="py-3 px-4">
-                        {% if p.status == "PAID" %}
-                            <span class="px-2 py-1 bg-green-200 text-green-800 rounded text-xs font-semibold">
-                                PAID
-                            </span>
-                        {% else %}
-                            <span class="px-2 py-1 bg-red-200 text-red-800 rounded text-xs font-semibold">
-                                FAILED
-                            </span>
-                        {% endif %}
-                    </td>
-                </tr>
+            <tr class="border-b border-dark hover:bg-bg-card-hover transition">
+
+                <td class="py-3 px-4 text-muted">{{ p.month }}</td>
+                <td class="py-3 px-4 text-primary">₹{{ p.amount }}</td>
+                <td class="py-3 px-4 text-sm text-primary">{{ p.payment_id }}</td>
+                <td class="py-3 px-4 text-sm text-muted">{{ p.date_paid|date:"F j, Y" }}</td>
+
+                <td class="py-3 px-4">
+                    {% if p.status == "PAID" %}
+                        <span class="px-2 py-1 rounded text-xs font-semibold"
+                              style="background:rgba(34,197,94,0.2); color:#22c55e;">
+                            PAID
+                        </span>
+                    {% else %}
+                        <span class="px-2 py-1 rounded text-xs font-semibold"
+                              style="background:rgba(239,68,68,0.2); color:#ef4444;">
+                            FAILED
+                        </span>
+                    {% endif %}
+                </td>
+
+            </tr>
             {% endfor %}
         {% else %}
             <tr>
-                <td colspan="5" class="text-center py-6 text-gray-600">
+                <td colspan="5" class="text-center py-6 text-muted">
                     No payment records found.
                 </td>
             </tr>
         {% endif %}
         </tbody>
+
     </table>
 
 </div>
+
+
 {% endblock %}

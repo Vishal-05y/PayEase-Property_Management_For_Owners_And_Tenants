@@ -1,22 +1,30 @@
-{% extends "base/owner_layout.html" %}
+{% extends "owner/ownerDashboard.html" %}
 
 {% block title %}Add Building{% endblock %}
 
 {% block navbar %}
-<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
-<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
+<a href="{% url 'ownerDashboard' %}" class="transition hover-accent">Dashboard</a>
+<a href="{% url 'addBuilding' %}" class="transition hover-accent">Add Building</a>
 <a href="{% url 'logoutOwner' %}">
-    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
+    <button class="px-2 py-1 rounded-lg transition btn-red">
+        Logout
+    </button>
 </a>
 {% endblock %}
 
+
+{% block back %}
+<a href="{% url 'ownerDashboard' %}" class="text-accent transition">Back</a>
+{% endblock %}
+
+
 {% block content %}
 
-<h1 class="text-3xl font-extrabold text-cyan-900 mb-8 text-center">
+<h1 class="text-3xl font-extrabold mb-8 text-center text-primary">
     Add New Building
 </h1>
 
-<div class="max-w-xl mx-auto bg-white rounded-2xl p-10">
+<div class="max-w-xl mx-auto rounded-2xl p-10 bg-card border-dark">
 
     <form method="POST" class="space-y-6">
         {% csrf_token %}
@@ -25,34 +33,37 @@
         <div class="flex flex-col space-y-1">
 
             <!-- Label -->
-            <label class="text-sm font-semibold text-cyan-700">
+            <label class="text-sm font-semibold text-muted">
                 {{ field.label }}
             </label>
 
-            <!-- Styled Input -->
+            <!-- Input -->
             <input
                 type="{{ field.field.widget.input_type }}"
                 name="{{ field.name }}"
                 value="{{ field.value|default_if_none:'' }}"
-                class="border border-gray-300 rounded-lg p-3 w-full
-                       focus:ring-2 focus:ring-cyan-600 focus:outline-none"
                 placeholder="Enter {{ field.label }}"
+                class="rounded-lg p-3 w-full transition bg-card text-primary border-dark"
+                onfocus="this.classList.add('border-light')"
+                onblur="this.classList.remove('border-light')"
             />
 
-            
-            
         </div>
         {% endfor %}
         
         <!-- Error -->
         {% if error %}
-        <div class="mb-4 p-4 bg-red-100 text-red-800 border border-red-300 rounded-lg">
+        <div class="mb-4 p-4 rounded-lg font-medium"
+             style="background:rgba(244,63,94,0.15);
+                    border:1px solid var(--btn-red);
+                    color:var(--btn-red);">
             {{ error }}
         </div>
         {% endif %}
 
-        <!-- Submit -->
-        <button type="submit" class="w-full bg-cyan-700 text-white py-3 rounded-xl font-semibold shadow hover:bg-cyan-800 transition">
+        <!-- Submit Button -->
+        <button type="submit"
+                class="w-full py-3 rounded-xl font-semibold shadow transition btn-blue">
             Save Building
         </button>
 

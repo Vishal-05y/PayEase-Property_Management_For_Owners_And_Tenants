@@ -1,121 +1,144 @@
-{% extends "base/owner_layout.html" %}
+{% extends "building/buildingDetails.html" %}
 
 {% block title %}Flat Details{% endblock %}
 
-{% block navbar %}
-<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
-<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
-<a href="{% url 'logoutOwner' %}">
-    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
-</a>
+{% block back %}
+<a href="{% url 'buildingDetails' flat.building.id %}" class="text-accent transition">Back</a>
 {% endblock %}
+
 
 {% block content %}
 
-<!-- Top Header Section -->
-<div class="flex items-center justify-between mb-10">
-    
-    <!-- Left: Building + Flat Info -->
-    <div>
-        <h1 class="text-4xl font-extrabold text-cyan-900 tracking-tight">
-            {{ flat.building.name }}
-        </h1>
+<!-- Header Section -->
+<div class="flex justify-between mb-8">
 
-        <p class="text-xl text-gray-700 mt-2">
-            Flat <span class="font-semibold">{{ flat.flat_number }}</span>  
-            {{ flat.flat_type }}
-        </p>
-    </div>
+    <h1 class="text-2xl font-bold tracking-tight text-primary">
+        Flat: {{ flat.flat_number }} - {{ flat.flat_type }}
+    </h1>
 
-    <!-- Right: Action Buttons -->
-    <div class="space-x-2">
-    
-    <!-- Flat Gallery -->
-    <a href="{% url 'flatGallery' flat.building.id flat.id %}">
-        <button class="px-5 py-2.5 bg-rose-400 text-white rounded-lg shadow hover:bg-rose-500 transition font-semibold">
-            Gallery
-        </button>
-    </a>
+    <div class="flex space-x-2">
 
-    <!-- Edit Flat -->
-    <a href="{% url 'editFlat' flat.building.id flat.id %}">
-        <button class="px-5 py-2.5 bg-amber-300 text-white rounded-lg shadow hover:bg-amber-400 transition font-semibold">
-            Edit
-        </button>
-    </a>
+        <!-- Flat Gallery -->
+        <a href="{% url 'flatGallery' flat.building.id flat.id %}">
+            <button class="px-3 py-1 rounded-lg shadow font-semibold transition btn-red">
+                Gallery
+            </button>
+        </a>
 
-    <!-- Remove Tenant -->
-    <a href="{% url 'removeTenant' flat.building.id flat.id %}">
-        <button class="px-5 py-2.5 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition font-semibold">
-            Remove Tenant
-        </button>
-    </a>
-
-    <!-- Add Tenant -->
-    <a href="{% url 'addTenant' flat.building.id flat.id %}">
-        <button class="px-5 py-2.5 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-900 transition font-semibold">
-            Add Tenant
-        </button>
-    </a>
-
-    <!-- Past Tenants -->
-    <a href="{% url 'pastTenants' flat.building.id flat.id %}">
-        <button class="px-5 py-2.5 bg-gray-700 text-white rounded-lg shadow hover:bg-gray-900 transition font-semibold">
-            Past Tenants
+        <!-- Edit Flat -->
+        <a href="{% url 'editFlat' flat.building.id flat.id %}">
+            <button class="px-3 py-1 rounded-lg shadow font-semibold transition btn-amber">
+                Edit
             </button>
         </a>
 
     </div>
+
 </div>
 
-<!-- Tenant Section -->
+
+
+<!-- Tenant Header -->
+{% if tenant %}
+<div class="flex items-center justify-between mb-4">
+
+    <h2 class="text-xl font-bold tracking-tight text-primary">Tenant Details</h2>
+
+    <a href="{% url 'pastTenants' flat.building.id flat.id %}">
+        <button class="px-4 py-2 rounded-lg shadow transition font-semibold text-sm btn-ash">
+            View Past Tenants
+        </button>
+    </a>
+
+</div>
+{% endif %}
+
+
+
+
+
+
 {% if tenant %}
 
-<h2 class="text-3xl font-bold text-cyan-900 text-center mb-8">
-    Tenant Details
-</h2>
-
-<!-- Centered Tenant Card -->
-<div class="max-w-2xl mx-auto bg-white border border-cyan-200 rounded-2xl shadow-md p-8 space-y-6">
+<!-- Tenant Card -->
+<div class="max-w-3xl mx-auto p-8 rounded-2xl shadow-xl bg-card border-dark">
 
     <!-- Tenant Name -->
-    <div>
-        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Tenant Name</p>
-        <p class="text-xl font-bold text-gray-900 mt-1">{{ tenant.name }}</p>
+    <div class="mb-6">
+        <p class="text-sm font-semibold uppercase tracking-wide text-muted">Tenant Name</p>
+        <p class="text-2xl font-bold mt-1 text-primary">{{ tenant.name }}</p>
     </div>
 
     <!-- Phone -->
-    <div>
-        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Phone</p>
-        <p class="text-lg text-gray-800 mt-1">{{ tenant.phone }}</p>
-    </div>
-
-    <!-- Flat Type -->
-    <div>
-        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Flat Type</p>
-        <p class="text-lg text-gray-800 mt-1">{{ flat.flat_type }}</p>
+    <div class="mb-6">
+        <p class="text-sm font-semibold uppercase tracking-wide text-muted">Phone</p>
+        <p class="text-lg mt-1 text-primary">{{ tenant.phone }}</p>
     </div>
 
     <!-- Rent -->
-    <div>
-        <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">Monthly Rent</p>
-        <p class="text-2xl font-bold text-cyan-900 mt-1">₹ {{ tenant.flat_price }}</p>
+    <div class="mb-8">
+        <p class="text-sm font-semibold uppercase tracking-wide text-muted">Monthly Rent</p>
+        <p class="text-2xl font-bold mt-1 text-accent">₹{{ tenant.flat_price }}</p>
     </div>
 
-    <!-- Payment History Button -->
-    <!-- Payment History Button -->
+    <!-- Payment History -->
     <a href="{% url 'tenantPaymentHistory' flat.building.id flat.id %}">
-        <button class="px-6 py-3 w-full bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-800 transition font-semibold">
+        <button class="px-6 py-3 w-full rounded-lg shadow transition font-semibold btn-blue">
             Payment History
         </button>
     </a>
+
 </div>
+
 
 {% else %}
 
-<!-- If No Tenant -->
-<p class="text-center text-gray-600 mt-10 text-lg">No tenants added yet.</p>
+<div class="text-center text-muted mb-3">
+    No active tenant currently assigned to this flat.
+</div>
+
+<!-- If NO ACTIVE Tenant -->
+<div class="flex items-center justify-center gap-3 mb-4">
+
+    <a href="{% url 'addTenant' flat.building.id flat.id %}">
+        <button class="px-4 py-2 rounded-lg shadow transition font-semibold btn-blue">
+            Add New Tenant
+        </button>
+    </a>
+
+    <a href="{% url 'pastTenants' flat.building.id flat.id %}">
+        <button class="px-4 py-2 rounded-lg shadow transition font-semibold btn-ash">
+            View Past Tenants
+        </button>
+    </a>
+
+</div>
 
 {% endif %}
+
+
+
+
+<!-- Action Buttons (only if tenant exists) -->
+{% if tenant %}
+<div class="flex items-center justify-center gap-3 mt-6 mb-8">
+
+    <!-- Remove Tenant -->
+    <a href="{% url 'removeTenant' flat.building.id flat.id %}">
+        <button class="px-4 py-2 rounded-lg shadow transition font-semibold btn-red">
+            Remove
+        </button>
+    </a>
+
+    <!-- Add Another Tenant -->
+    <a href="{% url 'addTenant' flat.building.id flat.id %}">
+        <button class="px-4 py-2 rounded-lg shadow transition font-semibold btn-blue">
+            Add New Tenant
+        </button>
+    </a>
+
+</div>
+{% endif %}
+
 
 {% endblock %}

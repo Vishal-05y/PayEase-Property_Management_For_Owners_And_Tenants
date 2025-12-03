@@ -5,50 +5,61 @@
 {% block content %}
 
 <!-- Centered Container -->
-<div class="flex justify-center">
-    <div class="w-full max-w-lg bg-white rounded-2xl p-10">
+<div class="flex justify-center bg-dark">
+    <div class="w-full max-w-lg rounded-2xl p-10 bg-card border-dark">
 
         <!-- Page Title -->
-        <h1 class="text-3xl font-extrabold text-cyan-900 mb-6 text-center">
+        <h1 class="text-3xl font-extrabold mb-6 text-center text-primary">
             Owner Login
         </h1>
 
-        <!-- Error Message -->
-        
         <!-- Login Form -->
         <form method="POST" class="space-y-6">
             {% csrf_token %}
-            
+
             <!-- Name Field -->
             <div class="flex flex-col space-y-1">
-                <label class="font-semibold text-gray-700">Name</label>
-                <input type="text" name="name" 
-                value="{{ form.name.value|default_if_none:'' }}"
-                class="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-cyan-600 focus:outline-none" />
+                <label class="font-semibold text-muted">Name</label>
+
+                <input type="text" name="name"
+                       value="{{ form.name.value|default_if_none:'' }}"
+                       placeholder="Enter Name"
+                       class="rounded-lg p-3 w-full bg-card text-primary border-dark transition"
+                       onfocus="this.classList.add('border-light')"
+                       onblur="this.classList.remove('border-light')">
             </div>
-            
+
             <!-- Phone Field -->
             <div class="flex flex-col space-y-1">
-                <label class="font-semibold text-gray-700">Phone Number</label>
-                <input type="text" name="phone" 
-                value="{{ form.phone.value|default_if_none:'' }}"
-                class="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-cyan-600 focus:outline-none" />
+                <label class="font-semibold text-muted">Phone Number</label>
+
+                <input type="text" name="phone"
+                       value="{{ form.phone.value|default_if_none:'' }}"
+                       placeholder="Enter Phone Number"
+                       class="rounded-lg p-3 w-full bg-card text-primary border-dark transition"
+                       onfocus="this.classList.add('border-light')"
+                       onblur="this.classList.remove('border-light')">
             </div>
-            
+
             {% if error %}
-            <div class="mb-6 p-4 rounded-lg bg-red-100 border border-red-300 text-red-800 font-medium">
+            <div class="mb-6 p-4 rounded-lg font-medium"
+                 style="background: rgba(244, 63, 94, 0.15); 
+                        border: 1px solid var(--btn-red); 
+                        color: var(--btn-red);">
                 {{ error }}
-                <a href="{% url 'signUpOwner' %}" class="underline text-cyan-800 font-semibold ml-1">
+                <a href="{% url 'signUpOwner' %}"
+                   class="underline font-semibold ml-1 text-accent">
                     Register here
                 </a>
             </div>
             {% endif %}
-            
+
             <!-- Submit Button -->
             <button type="submit"
-                class="w-full bg-cyan-700 text-white py-3 rounded-xl font-semibold shadow hover:bg-cyan-800 transition">
+                class="w-full py-3 rounded-xl font-semibold shadow transition btn-blue">
                 Login
             </button>
+
         </form>
 
     </div>

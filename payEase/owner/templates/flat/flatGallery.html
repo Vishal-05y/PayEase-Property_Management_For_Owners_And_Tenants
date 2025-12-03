@@ -1,104 +1,128 @@
-{% extends "base/owner_layout.html" %}
+{% extends "building/buildingDetails.html" %}
 
 {% block title %}Flat Gallery{% endblock %}
 
-{% block navbar %}
-<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
-<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
-<a href="{% url 'logoutOwner' %}">
-    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
-</a>
+
+{% block back %}
+<a href="{% url 'flatDetails' flat.building.id flat.id %}" class="text-accent transition">Back</a>
 {% endblock %}
 
-{% block content %}
-<a href="{% url 'flatDetails' flat.building.id flat.id %}">Back</a>
 
-<h1 class="text-4xl font-extrabold text-cyan-900 mb-6">
+{% block content %}
+<h1 class="text-3xl font-extrabold text-primary mb-6 mt-4">
     Flat {{ flat.flat_number }} — Gallery
 </h1>
 
-<!-- Back Button -->
+
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
 
     <!-- FLAT IMAGE GALLERY -->
-    <div class="bg-white p-8 rounded-2xl shadow border border-gray-200">
-        <h2 class="text-2xl font-semibold text-cyan-800 mb-6">Flat Images</h2>
+    <div class="bg-card p-8 rounded-2xl shadow border-dark">
+
+        <h2 class="text-2xl font-semibold text-primary mb-6">Flat Images</h2>
 
         {% if flat.images.all %}
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
 
-                {% for img in flat.images.all %}
-                    <div class="relative group rounded-xl border overflow-hidden shadow-sm">
+            {% for img in flat.images.all %}
+            <div class="relative group rounded-xl border-dark border overflow-hidden shadow-sm bg-card">
 
-                        <!-- IMAGE (opens slider) -->
-                        <img src="{{ img.image.url }}"
-                             class="w-full h-48 object-cover rounded-xl cursor-pointer"
-                             onclick="openSlider({{ forloop.counter0 }})">
+                <!-- Image -->
+                <img src="{{ img.image.url }}"
+                     class="w-full h-48 object-cover rounded-xl cursor-pointer"
+                     onclick="openSlider({{ forloop.counter0 }})">
 
-                        <!-- Delete Button -->
-                        <a href="{% url 'deleteFlatImage' img.id %}"
-                           class="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 text-sm rounded-lg 
-                                  opacity-0 group-hover:opacity-100 transition">
-                            Delete
-                        </a>
-
-                    </div>
-                {% endfor %}
+                <!-- Delete Button -->
+                <a href="{% url 'deleteFlatImage' img.id %}"
+                   class="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 text-sm rounded-lg 
+                          opacity-0 group-hover:opacity-100 transition">
+                    Delete
+                </a>
 
             </div>
+            {% endfor %}
+
+        </div>
+
         {% else %}
-            <p class="text-gray-600">No images uploaded yet.</p>
+        <p class="text-muted">No images uploaded yet.</p>
         {% endif %}
     </div>
 
 
-    <!-- UPLOAD FLAT IMAGES -->
-    <div class="bg-white p-8 rounded-2xl shadow border border-gray-200">
-        <h2 class="text-2xl font-semibold text-cyan-800 mb-4">Upload Images</h2>
+
+    <!-- UPLOAD SECTION -->
+    <div class="bg-card p-8 rounded-2xl shadow border-dark">
+
+        <h2 class="text-2xl font-semibold text-primary mb-4">Upload Images</h2>
 
         {% if request.session.upload_error %}
-            <div class="bg-red-100 text-red-800 border border-red-300 p-3 rounded-lg mb-4">
-                {{ request.session.upload_error }}
-            </div>
+        <div class="p-3 rounded-lg mb-4"
+             style="background: rgba(244,63,94,0.15);
+                    border: 1px solid var(--btn-red);
+                    color: var(--btn-red);">
+            {{ request.session.upload_error }}
+        </div>
 
-            <script>
-                fetch("/owner/clear-upload-error/");
-            </script>
+        <script> fetch("/owner/clear-upload-error/"); </script>
         {% endif %}
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
             <input type="file" name="images" multiple accept="image/*"
-                   class="w-full p-3 border rounded-lg"
+                   class="w-full p-3 border-dark rounded-lg bg-card text-primary transition"
+                   onfocus="this.classList.add('border-light')"
+                   onblur="this.classList.remove('border-light')"
                    onchange="checkLimit(this, {{ flat.images.count }})">
 
-            <button class="mt-4 px-6 py-3 bg-cyan-700 text-white rounded-xl shadow hover:bg-cyan-900 transition font-semibold">
+            <button class="mt-4 px-6 py-3 rounded-xl shadow transition font-semibold btn-blue">
                 Upload
             </button>
+
         </form>
     </div>
 
 </div>
 
 
+
+
+
 <!-- SLIDER MODAL -->
-<div id="sliderModal" class="fixed inset-0 bg-black bg-opacity-80 hidden z-50 flex items-center justify-center">
+<div id="sliderModal"
+     class="fixed inset-0 bg-black bg-opacity-80 hidden z-50 flex items-center justify-center">
 
-    <img id="sliderImage" src="" class="max-h-[90%] max-w-[90%] rounded-lg shadow-lg">
+    <img id="sliderImage"
+         src=""
+         class="max-h-[90%] max-w-[90%] rounded-lg shadow-lg">
 
-    <button onclick="closeSlider()" class="absolute top-5 right-5 text-white text-3xl font-bold">✕</button>
-    <button onclick="prevSlide()" class="absolute left-5 text-white text-4xl font-bold">❮</button>
-    <button onclick="nextSlide()" class="absolute right-5 text-white text-4xl font-bold">❯</button>
+    <button onclick="closeSlider()"
+            class="absolute top-5 right-5 text-white text-3xl font-bold">
+        ✕
+    </button>
+
+    <button onclick="prevSlide()"
+            class="absolute left-5 text-white text-4xl font-bold">
+        ❮
+    </button>
+
+    <button onclick="nextSlide()"
+            class="absolute right-5 text-white text-4xl font-bold">
+        ❯
+    </button>
+
 </div>
 
 
-<!-- SCRIPTS -->
+
+
+<!-- GALLERY SCRIPT -->
 <script>
 function checkLimit(input, currentCount) {
     if (currentCount + input.files.length > 5) {
-        alert("You can upload a maximum of 5 images only.");
+        alert("Maximum 5 images allowed.");
         input.value = "";
     }
 }
@@ -110,21 +134,25 @@ let sliderImages = [
     {% endfor %}
 ];
 
-function openSlider(i) {
-    sliderIndex = i;
+function openSlider(index) {
+    sliderIndex = index;
     document.getElementById("sliderModal").classList.remove("hidden");
     updateSlider();
 }
+
 function closeSlider() {
     document.getElementById("sliderModal").classList.add("hidden");
 }
+
 function updateSlider() {
     document.getElementById("sliderImage").src = sliderImages[sliderIndex];
 }
+
 function nextSlide() {
     sliderIndex = (sliderIndex + 1) % sliderImages.length;
     updateSlider();
 }
+
 function prevSlide() {
     sliderIndex = (sliderIndex - 1 + sliderImages.length) % sliderImages.length;
     updateSlider();

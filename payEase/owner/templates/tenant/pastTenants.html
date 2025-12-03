@@ -1,76 +1,81 @@
-{% extends "base/owner_layout.html" %}
+{% extends "building/buildingDetails.html" %}
 
 {% block title %}Past Tenants{% endblock %}
 
-{% block navbar %}
-<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
-<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
-<a href="{% url 'logoutOwner' %}">
-    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
-</a>
+
+{% block back %}
+<a href="{% url 'flatDetails' flat.building.id flat.id %}" class="text-accent transition">Back</a>
 {% endblock %}
 
-{% block content %}
-<a href="{% url 'flatDetails' flat.building.id flat.id %}">Back</a>
 
+{% block content %}
 <!-- Header -->
-<div class="mb-10">
-    <h1 class="text-4xl font-extrabold text-cyan-900 tracking-tight">
+<div class="mb-8">
+    <h1 class="text-3xl font-extrabold tracking-tight text-primary mb-1">
         Flat {{ flat.flat_number }}
     </h1>
 
-    <p class="text-xl text-gray-700 mt-2">
-        {{ flat.flat_type }} • {{ flat.building.name }}
+    <p class="text-muted">
+        {{ flat.flat_type }}
     </p>
 </div>
 
-<!-- Past Tenants Header -->
-<h2 class="text-3xl font-bold text-cyan-900 mb-6">
+<!-- Section Title -->
+<h2 class="text-2xl font-bold text-primary mb-6">
     Past Tenants
 </h2>
 
 {% if tenants %}
-    <!-- Tenants Grid -->
+    <!-- GRID -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
         {% for tenant in tenants %}
-            <div class="p-6 bg-white border border-cyan-200 rounded-2xl shadow-sm hover:shadow-md transition">
+        <div class="p-6 rounded-2xl bg-card border-dark shadow-sm transition">
 
-                <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">
-                    Tenant Name
+            <!-- Name -->
+            <p class="text-xs font-semibold uppercase tracking-wide text-muted">
+                Tenant Name
+            </p>
+            <p class="text-xl font-bold text-primary mt-1">
+                {{ tenant.name }}
+            </p>
+
+            <!-- Phone -->
+            <div class="mt-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-muted">
+                    Phone Number
                 </p>
-                <p class="text-xl font-bold text-gray-900 mt-1">
-                    {{ tenant.name }}
+                <p class="text-primary mt-1">
+                    {{ tenant.phone }}
                 </p>
-
-                <div class="mt-4">
-                    <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">
-                        Phone Number
-                    </p>
-                    <p class="text-gray-800 mt-1">
-                        {{ tenant.phone }}
-                    </p>
-                </div>
-
-                <div class="mt-4">
-                    <p class="text-sm font-semibold text-cyan-700 uppercase tracking-wide">
-                        Date Joined
-                    </p>
-                    <p class="text-gray-800 mt-1">
-                        {{ tenant.date_added|date:"F j, Y" }}
-                    </p>
-                </div>
-
-                <a href="{% url 'tenantFullDetails' tenant.id %}">
-                    <button class="mt-4 px-5 py-2 bg-cyan-700 text-white rounded-lg hover:bg-cyan-900 transition">
-                        View Tenant details
-                    </button>
-                </a>
             </div>
+
+            <!-- Date Joined -->
+            <div class="mt-4">
+                <p class="text-xs font-semibold uppercase tracking-wide text-muted">
+                    Date Joined
+                </p>
+                <p class="text-primary mt-1">
+                    {{ tenant.date_added|date:"F j, Y" }}
+                </p>
+            </div>
+
+            <!-- Button -->
+            <a href="{% url 'tenantFullDetails' tenant.id %}">
+                <button class="mt-4 w-full py-2 rounded-lg font-semibold btn-blue transition">
+                    View Tenant Details
+                </button>
+            </a>
+
+        </div>
         {% endfor %}
+
     </div>
 
 {% else %}
-    <p class="text-gray-600 text-lg mt-4">No past tenants found.</p>
+    <p class="text-muted text-lg mt-4">
+        No past tenants found.
+    </p>
 {% endif %}
 
 {% endblock %}

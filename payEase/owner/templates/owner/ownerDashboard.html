@@ -3,81 +3,124 @@
 {% block title %}Owner Dashboard{% endblock %}
 
 {% block navbar %}
-<a href="{% url 'ownerDashboard' %}" class="text-white hover:text-cyan-300">Dashboard</a>
-<a href="{% url 'addBuilding' %}" class="text-white hover:text-cyan-300">Add Building</a>
+<a href="{% url 'ownerDashboard' %}" class="transition hover-accent">Dashboard</a>
+<a href="{% url 'addBuilding' %}" class="transition hover-accent">Add Building</a>
+
 <a href="{% url 'logoutOwner' %}">
-    <button class="px-4 py-2 bg-red-700 text-white rounded">Logout</button>
+    <button class="px-2 py-1 rounded-lg transition btn-red">
+        Logout
+    </button>
 </a>
 {% endblock %}
 
+
 {% block content %}
 
-<!-- Dashboard Heading -->
-<h1 class="text-3xl font-bold text-cyan-900 mb-8">
-    Owner Dashboard
-</h1>
+<!-- 📌 STATS PANEL -->
+<div class="bg-card rounded-2xl border-dark p-6 mb-8">
+    <h2 class="text-xl font-bold mb-4 text-primary">Overview</h2>
 
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
 
-<!-- 🔹 Summary Cards -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+        <div>
+            <p class="text-sm text-muted">Buildings</p>
+            <p class="text-3xl font-bold text-primary">{{ total_buildings }}</p>
+        </div>
 
-    <div class="p-6 bg-blue-100 rounded-xl shadow text-center">
-        <h2 class="text-xl font-semibold text-cyan-800">Buildings</h2>
-        <p class="text-3xl font-bold">{{ total_buildings }}</p>
+        <div>
+            <p class="text-sm text-muted">Total Flats</p>
+            <p class="text-3xl font-bold text-primary">{{ total_flats }}</p>
+        </div>
+
+        <div>
+            <p class="text-sm text-green-400">Occupied</p>
+            <p class="text-3xl font-bold text-primary">{{ occupied_flats }}</p>
+        </div>
+
+        <div>
+            <p class="text-sm text-red-400">Vacant</p>
+            <p class="text-3xl font-bold text-primary">{{ vacant_flats }}</p>
+        </div>
+
     </div>
+</div>
 
-    <div class="p-6 bg-cyan-100 rounded-xl shadow text-center">
-        <h2 class="text-xl font-semibold text-cyan-800">Total Flats</h2>
-        <p class="text-3xl font-bold">{{ total_flats }}</p>
-    </div>
 
-    <div class="p-6 bg-green-100 rounded-xl shadow text-center">
-        <h2 class="text-xl font-semibold text-green-800">Occupied</h2>
-        <p class="text-3xl font-bold">{{ occupied_flats }}</p>
-    </div>
 
-    <div class="p-6 bg-red-100 rounded-xl shadow text-center">
-        <h2 class="text-xl font-semibold text-red-800">Vacant</h2>
-        <p class="text-3xl font-bold">{{ vacant_flats }}</p>
-    </div>
+<!-- 📌 UNPAID RENT PANEL -->
+<div class="bg-card rounded-2xl border-dark p-6 mb-8">
+    
+    <h2 class="text-xl font-bold text-red-400 mb-4">
+        Unpaid Rent — {{ current_month }}
+    </h2>
+
+    {% if unpaid_tenants %}
+        <div class="space-y-5">
+            {% for t in unpaid_tenants %}
+                <div class="border-dark rounded-xl p-4">
+
+                    <h3 class="text-lg font-semibold text-red-300">
+                        {{ t.name }} ({{ t.phone }})
+                    </h3>
+
+                    <p class="text-sm text-muted">
+                        <strong class="text-primary">Building:</strong> {{ t.flat.building.name }}
+                    </p>
+
+                    <p class="text-sm text-muted">
+                        <strong class="text-primary">Flat:</strong> {{ t.flat.flat_number }} • {{ t.flat.flat_type }}
+                    </p>
+
+                    <p class="text-sm text-muted">
+                        <strong class="text-primary">Rent:</strong> ₹{{ t.flat_price }}
+                    </p>
+
+                    <a href="{% url 'flatDetails' t.flat.building.id t.flat.id %}">
+                        <button class="mt-3 px-4 py-2 rounded-lg transition btn-blue">
+                            View Flat
+                        </button>
+                    </a>
+
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <p class="text-muted">All tenants have paid rent this month.</p>
+    {% endif %}
 
 </div>
 
 
-<!-- 🔥 Unpaid Rent Section -->
-<h2 class="text-2xl font-bold text-red-600 mt-12 mb-4">
-    Unpaid Rent — {{ current_month }}
-</h2>
 
-{% if unpaid_tenants %}
-    <div class="space-y-4">
+<!-- 📌 BUILDINGS PANEL -->
+<div class="bg-card rounded-2xl border-dark p-6">
 
-        {% for t in unpaid_tenants %}
-            <div class="p-5 bg-red-50 border border-red-300 rounded-xl shadow">
+    <h2 class="text-xl font-bold mb-4 text-primary">Your Buildings</h2>
 
-                <h3 class="text-xl font-semibold text-red-900">
-                    {{ t.name }} ({{ t.phone }})
+    <div class="space-y-6">
+
+        {% for building in buildings %}
+            <div class="border-dark p-4 rounded-xl">
+
+                <h3 class="text-lg font-bold text-primary">
+                    {{ building.name }}
                 </h3>
 
-                <p class="text-gray-700">
-                    <strong>Building:</strong> {{ t.flat.building.name }}
+                <p class="text-sm text-muted">
+                    Address: {{ building.address }}
                 </p>
 
-                <p class="text-gray-700">
-                    <strong>Flat:</strong> {{ t.flat.flat_number }} • {{ t.flat.flat_type }}
-                </p>
+                <div class="mt-3">
+                    <p class="text-sm text-muted">
+                        Total Flats:
+                        <span class="font-semibold text-primary">{{ building.flats.count }}</span>
+                    </p>
+                </div>
 
-                <p class="text-gray-700">
-                    <strong>Rent:</strong> ₹{{ t.flat_price }}
-                </p>
-
-                <p class="text-red-700 font-semibold mt-2">
-                    Not Paid for {{ current_month }}
-                </p>
-
-                <a href="{% url 'flatDetails' t.flat.building.id t.flat.id %}">
-                    <button class="mt-3 px-4 py-2 bg-cyan-700 text-white rounded-lg shadow hover:bg-cyan-800 transition">
-                        View Flat
+                <a href="{% url 'buildingDetails' building.id %}">
+                    <button class="mt-4 px-4 py-2 rounded-lg transition btn-blue">
+                        Manage Building
                     </button>
                 </a>
 
@@ -85,61 +128,6 @@
         {% endfor %}
 
     </div>
-
-{% else %}
-    <p class="text-gray-800 text-lg">All tenants have paid rent for {{ current_month }}</p>
-{% endif %}
-
-
-
-<!-- Add Building Button -->
-<div class="mt-6 mb-6">
-    <a href="{% url 'addBuilding' %}">
-        <button class="px-6 py-3 bg-cyan-700 text-white rounded-lg hover:bg-cyan-800 transition font-semibold">
-            Add Building
-        </button>
-    </a>
-</div>
-
-<!-- 🔹 Buildings List -->
-<h2 class="text-2xl font-bold text-cyan-900 mb-4"> Your Buildings</h2>
-
-<div class="space-y-6">
-    {% for building in buildings %}
-        <div class="p-6 bg-white rounded-xl shadow border border-cyan-200">
-
-            <h3 class="text-xl font-semibold text-cyan-800">
-                {{ building.name }}
-            </h3>
-
-            <p class="text-gray-600">Address: {{ building.address }}</p>
-
-            <!-- Flat Summary -->
-            <div class="mt-3">
-                <p class="text-gray-700">
-                    Total Flats: <span class="font-semibold">{{ building.flats.count }}</span>
-                </p>
-
-                {% with building.flats.count as bflats %}
-                    {% with building.flats|dictsort:"id" as flist %}
-                        {% comment %} Get occupied flats inside the building {% endcomment %}
-                        {% with building.flats.all as flat_list %}
-                            {% with flat_list|length as tflats %}
-                            {% endwith %}
-                        {% endwith %}
-                    {% endwith %}
-                {% endwith %}
-            </div>
-
-            <!-- Manage Button -->
-            <a href="{% url 'buildingDetails' building.id %}">
-                <button class="mt-4 px-5 py-2 bg-cyan-700 text-white rounded-lg hover:bg-cyan-900 transition">
-                    Manage Building
-                </button>
-            </a>
-
-        </div>
-    {% endfor %}
 </div>
 
 {% endblock %}
