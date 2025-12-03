@@ -59,6 +59,12 @@ urlpatterns = [
 
     path('tenant/<int:tenant_id>/details/', views.tenantFullDetails, name='tenantFullDetails'),
 
+
+    # Payments
+    path('buildings/<int:building_id>/payments/', views.ownerBuildingPayments, name='ownerBuildingPayments'),
+
+    path('buildings/<int:building_id>/flat/<int:flat_id>/payments/', views.ownerFlatPayments, name='ownerFlatPayments'),
+
     path('buildings/<int:building_id>/flat/<int:flat_id>/tenant/payment-history/', views.tenantPaymentHistory, name='tenantPaymentHistory'),
 
     path('tenant/<int:tenant_id>/transactions/', views.tenantAllTransactions, name='tenantAllTransactions'),

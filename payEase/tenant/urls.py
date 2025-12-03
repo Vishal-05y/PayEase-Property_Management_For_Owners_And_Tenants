@@ -18,7 +18,7 @@ urlpatterns = [
 
 
     # Flat
-    path('flat/<int:flat_id>/', views.tenantFlatDetails, name='flatDetails'),
+    path('flat/<int:flat_id>/', views.tenantFlatDetails, name='tenantflatDetails'),
 
     path('allFlats/', views.allFlats, name='allFlats'),
 
@@ -28,9 +28,11 @@ urlpatterns = [
     # Payment
     path('payRent/', views.payRent, name='payRent'),
 
-    path('processPayment/', views.processPayment, name='processPayment'),
+    path('createOrder/', views.createOrder, name='createOrder'),
 
     path('paymentSuccess/', views.paymentSuccess, name='paymentSuccess'),
+
+    path("paymentFailed/", views.paymentFailed, name="paymentFailed"),
 
     path('rentHistory/', views.rentHistory, name='rentHistory'),
 

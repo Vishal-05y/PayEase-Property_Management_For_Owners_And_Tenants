@@ -4,10 +4,13 @@ class Owner(models.Model):
     name = models.CharField(max_length=50)
     phone = models.CharField(max_length=10)
 
+    razorpay_key_id = models.CharField(max_length=200, null=True, blank=True)
+    razorpay_key_secret = models.CharField(max_length=200, null=True, blank=True)
+
     def __str__(self):
         return self.name
-    
 
+    
 class Building(models.Model):
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE, related_name='buildings')
     name = models.CharField(max_length=100)

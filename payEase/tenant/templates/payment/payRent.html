@@ -79,21 +79,56 @@
                 Rent already paid for {{ current_month }}.
             </p>
         {% else %}
-            <form action="{% url 'processPayment' %}" method="POST" class="mt-4">
-                {% csrf_token %}
-                <div class="max-w-md mx-auto">
-                    <button type="submit"
-                        class="w-full py-3 rounded-xl font-semibold shadow transition"
-                        style="background:#16a34a; color:var(--text-primary);"
-                        onmouseover="this.style.background='#15803d'"
-                        onmouseout="this.style.background='#16a34a'">
-                        Proceed to Payment
-                    </button>
-                </div>
-            </form>
+            <div class="max-w-md mx-auto mt-4">
+                <button onclick="payNow()"
+                    class="w-full py-3 rounded-xl font-semibold shadow transition"
+                    style="background:#16a34a; color:var(--text-primary);"
+                    onmouseover="this.style.background='#15803d'"
+                    onmouseout="this.style.background='#16a34a'">
+                    Proceed to Payment
+                </button>
+            </div>
         {% endif %}
     </div>
-
 </div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+function payNow() {
+    fetch("{% url 'createOrder' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}"
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        var options = {
+            "key": data.key_id,
+            "amount": data.amount,
+            "currency": "INR",
+            "name": "Rent Payment",
+            "description": "Monthly Rent",
+            "order_id": data.order_id,
+
+            "handler": function (response) {
+                const params = new URLSearchParams({
+                    payment_id: response.razorpay_payment_id,
+                    order_id: response.razorpay_order_id,
+                    signature: response.razorpay_signature
+                }).toString();
+
+                window.location.href = "/tenant/paymentSuccess/?" + params;
+            }
+
+        };
+
+        var rzp = new Razorpay(options);
+        rzp.open();
+    });
+}
+</script>
 
 {% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base/owner_layout.html" %}
+
+{% block title %}Payments – {{ building.name }}{% endblock %}
+
+{% block content %}
+
+<h1 class="text-3xl font-bold text-cyan-900 mb-6">
+    Payments – {{ flat.name }}
+</h1>
+
+<div class="bg-white p-6 rounded-xl shadow">
+
+<table class="w-full text-left">
+    <thead class="bg-cyan-700 text-white">
+        <tr>
+            <th class="py-2 px-3">Tenant</th>
+            <th class="py-2 px-3">Flat</th>
+            <th class="py-2 px-3">Month</th>
+            <th class="py-2 px-3">Amount</th>
+            <th class="py-2 px-3">Payment ID</th>
+            <th class="py-2 px-3">Paid On</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for p in payments %}
+        <tr class="border-b hover:bg-cyan-50">
+            <td class="py-2 px-3">{{ p.tenant.name }}</td>
+            <td class="py-2 px-3">Flat {{ p.flat.flat_number }}</td>
+            <td class="py-2 px-3">{{ p.month }}</td>
+            <td class="py-2 px-3">₹{{ p.amount }}</td>
+            <td class="py-2 px-3">{{ p.payment_id }}</td>
+            <td class="py-2 px-3">{{ p.date_paid|date:"F j, Y" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6" class="text-center py-5 text-gray-600">
+                No payments yet.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+
+{% endblock %}

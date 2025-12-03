@@ -695,3 +695,45 @@ def tenantAllTransactions(request, tenant_id):
         'building': building,
         'owner': owner
     })
+
+
+def ownerBuildingPayments(request, building_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    building = get_object_or_404(
+        Building, id=building_id, owner__phone=phone
+    )
+
+    payments = RentPayment.objects.filter(
+        flat__building=building
+    ).select_related('tenant', 'flat').order_by('-id')
+
+    return render(request, "payment/ownerBuildingPayments.html", {
+        "building": building,
+        "payments": payments
+    })
+
+
+def ownerFlatPayments(request, building_id, flat_id):
+    phone = request.session.get('owner_phone')
+    if not phone:
+        return redirect('loginOwner')
+
+    flat = get_object_or_404(
+        Flat,
+        id=flat_id,
+        building_id=building_id,
+        building__owner__phone=phone
+    )
+
+    payments = RentPayment.objects.filter(
+        flat=flat
+    ).select_related('tenant').order_by('-id')
+
+    return render(request, "payment/ownerFlatPayments.html", {
+        "flat": flat,
+        "building": flat.building,
+        "payments": payments
+    })

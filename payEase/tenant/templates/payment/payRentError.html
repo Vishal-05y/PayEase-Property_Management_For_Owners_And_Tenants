@@ -1,0 +1,30 @@
+{% extends "base/tenant_layout.html" %}
+
+{% block title %}Payment Error{% endblock %}
+
+{% block content %}
+
+<div class="max-w-xl mx-auto mt-16 p-8 bg-white border border-red-300 rounded-2xl shadow">
+
+    <h1 class="text-3xl font-bold text-red-700 mb-4 text-center">
+        Unable to Process Payment
+    </h1>
+
+    <p class="text-gray-700 text-center text-lg">
+        {{ reason }}
+    </p>
+
+    <div class="mt-8 text-center">
+        <a href="{% url 'tenantDashboard' %}">
+            <button class="px-6 py-3 rounded-lg text-white font-semibold"
+                style="background:#0ea5e9;"
+                onmouseover="this.style.background='#0284c7'"
+                onmouseout="this.style.background='#0ea5e9'">
+                Back to Dashboard
+            </button>
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}
