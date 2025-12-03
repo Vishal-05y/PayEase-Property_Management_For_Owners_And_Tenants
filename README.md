@@ -1,4 +1,4 @@
-# PayEase – Property Management for Owners & Tenants
+# Property Management for Owners & Tenants
 
 PayEase is a simple and efficient platform designed for building owners to manage buildings, flats, tenants, and payments in one place. It eliminates manual record-keeping and brings clarity, transparency, and convenience to both owners and tenants.
 
